@@ -157,6 +157,23 @@ select.input option{background:#181818}
 </head>
 <body>
 
+
+<!-- LOGIN -->
+<div id="login-screen" style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;background:var(--bg);padding:24px">
+  <div style="width:100%;max-width:340px">
+    <div style="text-align:center;margin-bottom:40px">
+      <div style="font-family:'Anton',sans-serif;font-size:48px;letter-spacing:6px;background:linear-gradient(135deg,#fff,var(--orange));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">🎾 PADELEIROS</div>
+      <div style="color:var(--muted);font-size:12px;letter-spacing:2px;text-transform:uppercase;font-weight:700;margin-top:8px">Acesso privado</div>
+    </div>
+    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:28px">
+      <div style="font-size:11px;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);font-weight:700;margin-bottom:8px">Password</div>
+      <input type="password" id="login-input" class="input" placeholder="Introduz a password" onkeydown="if(event.key==='Enter')doLogin()" style="margin-bottom:16px"/>
+      <div id="login-error" style="color:#e06060;font-size:13px;margin-bottom:12px;display:none">❌ Password incorreta</div>
+      <button class="btn btn-primary" style="width:100%;padding:15px;font-size:15px" onclick="doLogin()">Entrar</button>
+    </div>
+  </div>
+</div>
+
 <div id="loading-screen" class="loading-screen">
   <div class="loading-logo">🎾 PADELEIROS</div>
   <div class="spinner"></div>
@@ -709,7 +726,43 @@ window.deletePlayer=async function(id){
   await fbLoadAll();setSyncStatus("ok");renderAll();
 };
 
-loadData();
+// ── AUTH ──────────────────────────────────────────────────────────────────────
+const PASSWORD_HASH = "8e7b5c3a9f2d1e6b4a0c7f5d8e2b9a3c6f1d4e7b0a5c8f2d9e6b3a7c0f4d1e8"; // SHA-256 placeholder
+const CORRECT = "padeleiros2025"; // <-- MUDA ESTA PASSWORD
+
+async function hashStr(str) {
+  const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(str));
+  return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,"0")).join("");
+}
+
+window.doLogin = async function() {
+  const val = document.getElementById("login-input").value;
+  const stored = sessionStorage.getItem("padeleiros_auth");
+  const hash = await hashStr(val);
+  const correctHash = await hashStr(CORRECT);
+  if (hash === correctHash) {
+    sessionStorage.setItem("padeleiros_auth", correctHash);
+    document.getElementById("login-screen").style.display = "none";
+    loadData();
+  } else {
+    document.getElementById("login-error").style.display = "block";
+    document.getElementById("login-input").value = "";
+    document.getElementById("login-input").focus();
+  }
+};
+
+async function checkAuth() {
+  const stored = sessionStorage.getItem("padeleiros_auth");
+  const correctHash = await hashStr(CORRECT);
+  if (stored === correctHash) {
+    document.getElementById("login-screen").style.display = "none";
+    loadData();
+  }
+  // else: login screen stays visible
+}
+
+checkAuth();
+
 </script>
 </body>
 </html>
