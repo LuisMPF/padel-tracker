@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>🎾 Padel Tracker</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:#0a0a0a;color:#f0f0f0;font-family:'DM Sans',sans-serif;min-height:100vh}
+  .nav{display:flex;align-items:center;border-bottom:1px solid #242424;padding:0 24px;background:#0d0d0d;overflow-x:auto}
+  .nav-brand{font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:2px;color:#C8FF00;margin-right:32px;padding:18px 0;white-space:nowrap}
+  .nav-btn{padding:20px 16px;font-size:13px;font-weight:500;color:#666;background:none;border:none;cursor:pointer;border-bottom:2px solid transparent;letter-spacing:.5px;transition:all .2s;text-transform:uppercase;white-space:nowrap}
+  .nav-btn:hover{color:#f0f0f0}.nav-btn.active{color:#C8FF00;border-bottom-color:#C8FF00}
+  .sync-bar{display:flex;align-items:center;gap:8px;padding:8px 24px;font-size:12px;border-bottom:1px solid #242424;background:#0d0d0d}
+  .sync-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+  .sync-label{color:#666}.sync-label.ok{color:#C8FF00}.sync-label.error{color:#ff6060}.sync-label.syncing{color:#888}
+  .refresh-btn{margin-left:auto;padding:3px 12px;font-size:12px;border-radius:6px;border:1px solid #242424;background:transparent;color:#666;cursor:pointer}
+  .refresh-btn:hover{color:#f0f0f0;border-color:#444}
+  .content{max-width:1100px;margin:0 auto;padding:40px 24px}
+  .page-title{font-family:'Bebas Neue',sans-serif;font-size:42px;letter-spacing:3px;margin-bottom:32px}
+  .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+  .grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+  .card{background:#141414;border:1px solid #242424;border-radius:12px;padding:24px}
+  .card-sm{background:#141414;border:1px solid #242424;border-radius:10px;padding:18px 20px}
+  .card-label{font-size:11px;text-transform:uppercase;letter-spacing:1.5px;color:#666;margin-bottom:8px}
+  .card-value{font-family:'Bebas Neue',sans-serif;font-size:48px;letter-spacing:2px;color:#C8FF00;line-height:1}
+  .card-sub{font-size:13px;color:#666;margin-top:6px}
+  .section-title{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:2px;margin-bottom:16px}
+  .table{width:100%;border-collapse:collapse}
+  .table th{text-align:left;font-size:11px;letter-spacing:1.2px;text-transform:uppercase;color:#666;border-bottom:1px solid #242424;padding:10px 14px;font-weight:500}
+  .table td{padding:13px 14px;font-size:14px;border-bottom:1px solid #1a1a1a}
+  .table tr:last-child td{border-bottom:none}.table tbody tr:hover td{background:#1a1a1a}
+  .badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:12px;font-weight:600}
+  .badge-win{background:rgba(200,255,0,.12);color:#C8FF00}
+  .badge-loss{background:rgba(255,60,60,.12);color:#ff6060}
+  .badge-sub{background:rgba(120,120,255,.13);color:#a0a0ff}
+  .rank{font-family:'Bebas Neue',sans-serif;font-size:18px}
+  .rank-1{color:#C8FF00}.rank-2{color:#aaa}.rank-3{color:#c87533}.rank-n{color:#444}
+  .input{background:#1c1c1c;border:1px solid #242424;border-radius:8px;color:#f0f0f0;font-size:14px;padding:10px 14px;font-family:'DM Sans',sans-serif;outline:none;width:100%;transition:border .2s}
+  .input:focus{border-color:#C8FF00}
+  select.input option{background:#1c1c1c}
+  .btn{padding:11px 24px;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;border:none;transition:all .2s;font-family:'DM Sans',sans-serif}
+  .btn-primary{background:#C8FF00;color:#000}.btn-primary:hover{background:#d4ff1a;transform:translateY(-1px)}
+  .btn-ghost{background:transparent;color:#666;border:1px solid #242424}.btn-ghost:hover{color:#f0f0f0;border-color:#444}
+  .btn-danger{background:transparent;color:#ff6060;border:1px solid #3a1a1a;font-size:12px;padding:6px 14px}.btn-danger:hover{background:#3a1a1a}
+  .form-group{display:flex;flex-direction:column;gap:8px;margin-bottom:20px}
+  .form-label{font-size:12px;text-transform:uppercase;letter-spacing:1px;color:#666;font-weight:500}
+  .team-box{background:#111;border:1px solid #242424;border-radius:10px;padding:18px}
+  .team-box-title{font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:1.5px;margin-bottom:14px;color:#666}
+  .score-box{display:flex;align-items:center;gap:16px;background:#111;border-radius:10px;padding:18px 24px;border:1px solid #242424;margin-bottom:24px}
+  .score-input{width:80px;text-align:center;font-size:24px;font-family:'Bebas Neue',sans-serif;letter-spacing:2px}
+  .score-divider{font-family:'Bebas Neue',sans-serif;font-size:32px;color:#242424}
+  .alert{padding:12px 16px;border-radius:8px;font-size:14px;margin-bottom:20px}
+  .alert-ok{background:rgba(200,255,0,.08);border:1px solid rgba(200,255,0,.2);color:#C8FF00}
+  .alert-err{background:rgba(255,60,60,.08);border:1px solid rgba(255,60,60,.2);color:#ff6060}
+  .empty{text-align:center;padding:60px 20px;color:#666;font-size:14px;line-height:2}
+  .filter-bar{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+  .filter-label{font-size:12px;text-transform:uppercase;letter-spacing:1px;color:#666}
+  .filter-input{width:150px}
+  .tag{font-size:11px;padding:2px 8px;border-radius:4px;background:#222;color:#666;margin-left:6px}
+  .tag-core{background:rgba(200,255,0,.08);color:rgba(200,255,0,.7)}
+  .highlight-card{border-color:rgba(200,255,0,.2);background:linear-gradient(135deg,#141414,#161e00)}
+  .worst-card{border-color:#2a1a1a}
+  .bar-wrap{display:flex;align-items:center;gap:10px}
+  .bar-bg{flex:1;height:4px;background:#222;border-radius:2px;max-width:80px}
+  .bar-fill{height:100%;border-radius:2px;transition:width .3s}
+  .player-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid #242424}
+  .player-row:last-child{border-bottom:none}
+  .hidden{display:none}
+  .spinner{display:inline-block;width:8px;height:8px;border:2px solid #333;border-top-color:#C8FF00;border-radius:50%;animation:spin .6s linear infinite;flex-shrink:0}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .loading-screen{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;gap:16px}
+  .loading-title{font-family:'Bebas Neue',sans-serif;font-size:36px;color:#C8FF00;letter-spacing:3px}
+  .loading-spinner{width:28px;height:28px;border:3px solid #222;border-top-color:#C8FF00;border-radius:50%;animation:spin .7s linear infinite}
+  .loading-text{color:#666;font-size:14px}
+  @media(max-width:700px){.grid-2,.grid-4{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<!-- LOADING -->
+<div id="loading-screen" class="loading-screen">
+  <div class="loading-title">🎾 PADEL</div>
+  <div class="loading-spinner"></div>
+  <div class="loading-text">A carregar dados do Google Sheets...</div>
+</div>
+
+<!-- APP -->
+<div id="app" class="hidden">
+  <nav class="nav">
+    <span class="nav-brand">🎾 PADEL</span>
+    <button class="nav-btn active" onclick="showView('dashboard')">Dashboard</button>
+    <button class="nav-btn" onclick="showView('register')">Registar Jogo</button>
+    <button class="nav-btn" onclick="showView('history')">Histórico</button>
+    <button class="nav-btn" onclick="showView('players')">Jogadores</button>
+  </nav>
+
+  <div class="sync-bar">
+    <div class="sync-dot" id="sync-dot" style="background:#666"></div>
+    <span class="sync-label" id="sync-label">A ligar...</span>
+    <button class="refresh-btn" onclick="loadData()">↻ Atualizar</button>
+  </div>
+
+  <div class="content">
+    <!-- DASHBOARD -->
+    <div id="view-dashboard">
+      <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:28px;flex-wrap:wrap;gap:12px">
+        <h1 class="page-title" style="margin-bottom:0">Estatísticas</h1>
+        <div class="filter-bar">
+          <span class="filter-label">De</span>
+          <input type="date" class="input filter-input" id="filter-from" onchange="renderDashboard()"/>
+          <span class="filter-label">Até</span>
+          <input type="date" class="input filter-input" id="filter-to" onchange="renderDashboard()"/>
+          <button class="btn btn-ghost" style="padding:8px 14px;font-size:12px" onclick="clearFilters()">Limpar</button>
+        </div>
+      </div>
+      <div id="dashboard-content"></div>
+    </div>
+
+    <!-- REGISTER -->
+    <div id="view-register" class="hidden">
+      <h1 class="page-title">Registar Jogo</h1>
+      <div id="register-alert" class="hidden"></div>
+      <div style="max-width:560px">
+        <div class="form-group">
+          <label class="form-label">Data</label>
+          <input type="date" class="input" id="game-date"/>
+        </div>
+        <div class="grid-2" style="margin-bottom:20px">
+          <div class="team-box">
+            <div class="team-box-title">Equipa 1</div>
+            <select class="input" id="t1p1" style="margin-bottom:12px"><option value="">Jogador 1</option></select>
+            <select class="input" id="t1p2"><option value="">Jogador 2</option></select>
+          </div>
+          <div class="team-box">
+            <div class="team-box-title">Equipa 2</div>
+            <select class="input" id="t2p1" style="margin-bottom:12px"><option value="">Jogador 1</option></select>
+            <select class="input" id="t2p2"><option value="">Jogador 2</option></select>
+          </div>
+        </div>
+        <div class="score-box">
+          <div style="flex:1">
+            <div class="form-label" style="margin-bottom:6px">Equipa 1</div>
+            <input type="number" min="0" class="input score-input" id="score1" placeholder="0"/>
+          </div>
+          <div class="score-divider">—</div>
+          <div style="flex:1">
+            <div class="form-label" style="margin-bottom:6px">Equipa 2</div>
+            <input type="number" min="0" class="input score-input" id="score2" placeholder="0"/>
+          </div>
+        </div>
+        <button class="btn btn-primary" style="width:100%" onclick="registerGame()">Guardar no Google Sheets</button>
+      </div>
+    </div>
+
+    <!-- HISTORY -->
+    <div id="view-history" class="hidden">
+      <h1 class="page-title">Histórico</h1>
+      <div id="history-content"></div>
+    </div>
+
+    <!-- PLAYERS -->
+    <div id="view-players" class="hidden">
+      <h1 class="page-title">Jogadores</h1>
+      <div style="max-width:500px">
+        <div class="card" style="margin-bottom:20px">
+          <div class="section-title">Habituais</div>
+          <div id="core-players-list"></div>
+        </div>
+        <div class="card" style="margin-bottom:20px">
+          <div class="section-title">Substitutos</div>
+          <div id="sub-players-list"></div>
+        </div>
+        <div class="card">
+          <div class="section-title">Adicionar Jogador</div>
+          <div style="display:flex;gap:10px;margin-bottom:12px">
+            <input class="input" id="new-player-name" placeholder="Nome"/>
+            <select class="input" id="new-player-type" style="width:140px">
+              <option value="habitual">Habitual</option>
+              <option value="substituto">Substituto</option>
+            </select>
+            <button class="btn btn-primary" style="white-space:nowrap" onclick="addPlayer()">Adicionar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ─── CONFIG ───────────────────────────────────────────────────────────────────
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzRuqNsjtxPbuZvybGB9M8Pru_LDzWFLVxE8dJwpy28rUly0IuiyqJPGzscdNJYg5qxDA/exec";
+
+// ─── STATE ────────────────────────────────────────────────────────────────────
+let games = [];
+let players = []; // [{name, type}]
+let currentView = "dashboard";
+
+// ─── API ──────────────────────────────────────────────────────────────────────
+async function api(action, body = null) {
+  setSyncStatus("syncing");
+  try {
+    let res;
+    if (action === "getAll") {
+      res = await fetch(`${SCRIPT_URL}?action=getAll`);
+    } else {
+      res = await fetch(`${SCRIPT_URL}?action=${action}`, {
+        method: "POST",
+        body: JSON.stringify({ action, ...body })
+      });
+    }
+    const data = await res.json();
+    if (data.error) throw new Error(data.error);
+    setSyncStatus("ok");
+    return data;
+  } catch(e) {
+    setSyncStatus("error");
+    throw e;
+  }
+}
+
+// ─── SYNC STATUS ──────────────────────────────────────────────────────────────
+function setSyncStatus(status) {
+  const dot = document.getElementById("sync-dot");
+  const label = document.getElementById("sync-label");
+  const colors = { ok:"#C8FF00", error:"#ff6060", syncing:"#888" };
+  const labels = { ok:"Sincronizado com Google Sheets", error:"Erro de ligação ao Google Sheets", syncing:"A sincronizar..." };
+  dot.style.background = colors[status];
+  label.textContent = labels[status];
+  label.className = `sync-label ${status}`;
+  // replace dot with spinner when syncing
+  dot.style.display = status === "syncing" ? "none" : "block";
+}
+
+// ─── LOAD DATA ────────────────────────────────────────────────────────────────
+async function loadData() {
+  try {
+    const data = await api("getAll");
+    games = data.games || [];
+    players = data.players || [];
+    renderAll();
+    document.getElementById("loading-screen").classList.add("hidden");
+    document.getElementById("app").classList.remove("hidden");
+  } catch(e) {
+    document.getElementById("loading-screen").innerHTML = `
+      <div class="loading-title">🎾 PADEL</div>
+      <div style="color:#ff6060;font-size:14px;text-align:center;max-width:400px">
+        Erro ao ligar ao Google Sheets.<br>Verifica se o script está publicado corretamente.<br><br>
+        <button class="btn btn-primary" onclick="loadData()">Tentar novamente</button>
+      </div>`;
+  }
+}
+
+// ─── VIEWS ────────────────────────────────────────────────────────────────────
+function showView(view) {
+  currentView = view;
+  ["dashboard","register","history","players"].forEach(v => {
+    document.getElementById(`view-${v}`).classList.toggle("hidden", v !== view);
+  });
+  document.querySelectorAll(".nav-btn").forEach((btn, i) => {
+    btn.classList.toggle("active", ["dashboard","register","history","players"][i] === view);
+  });
+  renderAll();
+}
+
+function renderAll() {
+  renderDashboard();
+  renderHistory();
+  renderPlayers();
+  populateSelects();
+}
+
+// ─── DASHBOARD ────────────────────────────────────────────────────────────────
+function getFilteredGames() {
+  const from = document.getElementById("filter-from").value;
+  const to = document.getElementById("filter-to").value;
+  return games.filter(g => (!from || g.date >= from) && (!to || g.date <= to));
+}
+
+function clearFilters() {
+  document.getElementById("filter-from").value = "";
+  document.getElementById("filter-to").value = "";
+  renderDashboard();
+}
+
+function computeStats(filteredGames) {
+  const wins={}, losses={}, played={}, pairWins={}, pairGames={}, streaks={}, curStreak={};
+
+  const allNames = [...new Set([...players.map(p=>p.name), ...filteredGames.flatMap(g=>[...g.team1,...g.team2])])];
+  allNames.forEach(p => { wins[p]=0;losses[p]=0;played[p]=0;streaks[p]=0;curStreak[p]=0; });
+
+  [...filteredGames].sort((a,b)=>a.date.localeCompare(b.date)).forEach(g => {
+    const t1w = parseInt(g.score1) > parseInt(g.score2);
+    const winner = t1w ? g.team1 : g.team2;
+    const loser  = t1w ? g.team2 : g.team1;
+    winner.forEach(p => { wins[p]=(wins[p]||0)+1; played[p]=(played[p]||0)+1; curStreak[p]=(curStreak[p]||0)+1; if(curStreak[p]>(streaks[p]||0)) streaks[p]=curStreak[p]; });
+    loser.forEach(p  => { losses[p]=(losses[p]||0)+1; played[p]=(played[p]||0)+1; curStreak[p]=0; });
+    const wp=[...winner].sort().join(" & "), lp=[...loser].sort().join(" & ");
+    pairWins[wp]=(pairWins[wp]||0)+1;
+    pairGames[wp]=(pairGames[wp]||0)+1;
+    pairGames[lp]=(pairGames[lp]||0)+1;
+  });
+
+  const pairRate = {};
+  Object.keys(pairGames).forEach(p => pairRate[p] = ((pairWins[p]||0)/pairGames[p])*100);
+  const sortedPairs = Object.entries(pairRate).sort((a,b)=>b[1]-a[1]);
+
+  return { wins, losses, played, streaks, curStreak, pairWins, pairGames, pairRate, bestPair: sortedPairs[0]||null, worstPair: sortedPairs.length>1?sortedPairs[sortedPairs.length-1]:null };
+}
+
+function renderDashboard() {
+  const el = document.getElementById("dashboard-content");
+  const fg = getFilteredGames();
+  if (fg.length === 0) {
+    el.innerHTML = `<div class="empty">Nenhum jogo registado ainda.<br>Começa por registar um jogo! 🏓</div>`;
+    return;
+  }
+
+  const s = computeStats(fg);
+  const leaderboard = [...new Set([...players.map(p=>p.name), ...Object.keys(s.wins)])]
+    .map(n => ({ name:n, wins:s.wins[n]||0, losses:s.losses[n]||0, games:s.played[n]||0, streak:s.streaks[n]||0, cur:s.curStreak[n]||0 }))
+    .filter(p => p.games > 0)
+    .sort((a,b) => b.wins-a.wins || a.losses-b.losses);
+
+  const isCore = n => players.find(p=>p.name===n)?.type === "habitual";
+
+  const rankClass = i => i===0?"rank rank-1":i===1?"rank rank-2":i===2?"rank rank-3":"rank rank-n";
+
+  el.innerHTML = `
+    <div class="grid-4" style="margin-bottom:24px">
+      <div class="card-sm"><div class="card-label">Total de jogos</div><div class="card-value">${fg.length}</div></div>
+      <div class="card-sm"><div class="card-label">Jogadores ativos</div><div class="card-value">${leaderboard.length}</div></div>
+      <div class="card-sm highlight-card">
+        <div class="card-label">Melhor dupla</div>
+        ${s.bestPair ? `<div style="font-size:14px;font-weight:600;color:#C8FF00;margin-top:4px">${s.bestPair[0]}</div><div class="card-sub">${s.pairWins[s.bestPair[0]]||0}V — ${Math.round(s.bestPair[1])}% vitórias</div>` : `<div class="card-sub">—</div>`}
+      </div>
+      <div class="card-sm worst-card">
+        <div class="card-label">Pior dupla</div>
+        ${s.worstPair ? `<div style="font-size:14px;font-weight:600;color:#ff6060;margin-top:4px">${s.worstPair[0]}</div><div class="card-sub">${s.pairWins[s.worstPair[0]]||0}V — ${Math.round(s.worstPair[1])}% vitórias</div>` : `<div class="card-sub">—</div>`}
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom:24px">
+      <div class="section-title">Classificação</div>
+      <table class="table">
+        <thead><tr><th>#</th><th>Jogador</th><th>Jogos</th><th>Vitórias</th><th>Derrotas</th><th>% Vitórias</th><th>Streak atual</th><th>Record streak</th></tr></thead>
+        <tbody>
+          ${leaderboard.map((p,i) => `
+            <tr>
+              <td><span class="${rankClass(i)}">${i+1}</span></td>
+              <td style="font-weight:500">${p.name}${!isCore(p.name)?`<span class="tag">sub</span>`:""}</td>
+              <td>${p.games}</td>
+              <td><span class="badge badge-win">${p.wins}</span></td>
+              <td><span class="badge badge-loss">${p.losses}</span></td>
+              <td>${p.games>0?Math.round((p.wins/p.games)*100)+"%":"—"}</td>
+              <td>${p.cur>0?`<span style="color:#C8FF00;font-weight:600">🔥 ${p.cur}</span>`:`<span style="color:#444">—</span>`}</td>
+              <td style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:${p.streak>=3?"#C8FF00":"#f0f0f0"}">${p.streak}</td>
+            </tr>`).join("")}
+        </tbody>
+      </table>
+    </div>
+
+    <div class="card">
+      <div class="section-title">Duplas</div>
+      ${Object.keys(s.pairGames).length===0?`<div class="empty">Sem dados suficientes.</div>`:`
+      <table class="table">
+        <thead><tr><th>Dupla</th><th>Jogos</th><th>Vitórias</th><th>% Vitórias</th></tr></thead>
+        <tbody>
+          ${Object.entries(s.pairRate).sort((a,b)=>b[1]-a[1]).map(([pair,rate])=>`
+            <tr>
+              <td style="font-weight:500">${pair}</td>
+              <td>${s.pairGames[pair]}</td>
+              <td><span class="badge badge-win">${s.pairWins[pair]||0}</span></td>
+              <td><div class="bar-wrap"><div class="bar-bg"><div class="bar-fill" style="width:${rate}%;background:${rate>=60?"#C8FF00":rate>=40?"#888":"#ff6060"}"></div></div><span style="font-size:13px;color:${rate>=60?"#C8FF00":rate<40?"#ff6060":"#f0f0f0"}">${Math.round(rate)}%</span></div></td>
+            </tr>`).join("")}
+        </tbody>
+      </table>`}
+    </div>`;
+}
+
+// ─── REGISTER GAME ────────────────────────────────────────────────────────────
+function populateSelects() {
+  const selects = ["t1p1","t1p2","t2p1","t2p2"];
+  selects.forEach((id,i) => {
+    const sel = document.getElementById(id);
+    const cur = sel.value;
+    const labels = ["Jogador 1","Jogador 2","Jogador 1","Jogador 2"];
+    sel.innerHTML = `<option value="">${labels[i]}</option>` +
+      players.map(p=>`<option value="${p.name}"${p.name===cur?" selected":""}>${p.name}${p.type==="substituto"?" (sub)":""}</option>`).join("");
+  });
+  const dateEl = document.getElementById("game-date");
+  if (!dateEl.value) dateEl.value = new Date().toISOString().slice(0,10);
+}
+
+function showAlert(msg, type) {
+  const el = document.getElementById("register-alert");
+  el.className = `alert alert-${type}`;
+  el.textContent = msg;
+  el.classList.remove("hidden");
+  if (type === "ok") setTimeout(()=>el.classList.add("hidden"), 3000);
+}
+
+async function registerGame() {
+  const t1 = [document.getElementById("t1p1").value, document.getElementById("t1p2").value];
+  const t2 = [document.getElementById("t2p1").value, document.getElementById("t2p2").value];
+  const s1 = document.getElementById("score1").value;
+  const s2 = document.getElementById("score2").value;
+  const date = document.getElementById("game-date").value;
+
+  if (!t1[0]||!t1[1]||!t2[0]||!t2[1]) return showAlert("Seleciona todos os jogadores.", "err");
+  if (t1[0]===t1[1]||t2[0]===t2[1]) return showAlert("Um jogador não pode jogar consigo mesmo.", "err");
+  if (new Set([...t1,...t2]).size!==4) return showAlert("O mesmo jogador não pode estar em ambas as equipas.", "err");
+  if (s1===""||s2==="") return showAlert("Insere os resultados.", "err");
+  if (parseInt(s1)===parseInt(s2)) return showAlert("O resultado não pode ser empate.", "err");
+
+  try {
+    await api("addGame", { game: { date, team1:t1, team2:t2, score1:s1, score2:s2 } });
+    await loadData();
+    document.getElementById("t1p1").value="";document.getElementById("t1p2").value="";
+    document.getElementById("t2p1").value="";document.getElementById("t2p2").value="";
+    document.getElementById("score1").value="";document.getElementById("score2").value="";
+    showAlert("Jogo guardado no Google Sheets! ✅", "ok");
+  } catch(e) {
+    showAlert("Erro ao guardar. Verifica a ligação.", "err");
+  }
+}
+
+// ─── HISTORY ─────────────────────────────────────────────────────────────────
+function renderHistory() {
+  const el = document.getElementById("history-content");
+  if (games.length===0) { el.innerHTML=`<div class="empty">Nenhum jogo registado ainda.</div>`; return; }
+  const isCore = n => players.find(p=>p.name===n)?.type==="habitual";
+  const sorted = [...games].sort((a,b)=>b.date.localeCompare(a.date));
+  el.innerHTML = `<div class="card"><table class="table">
+    <thead><tr><th>Data</th><th>Equipa 1</th><th>Resultado</th><th>Equipa 2</th><th>Vencedor</th><th></th></tr></thead>
+    <tbody>
+      ${sorted.map(g => {
+        const t1w = parseInt(g.score1)>parseInt(g.score2);
+        const fmt = d => new Date(d).toLocaleDateString("pt-PT",{day:"2-digit",month:"2-digit",year:"numeric"});
+        const playerEl = (n) => n + (!isCore(n)?`<span class="tag">sub</span>`:"");
+        return `<tr>
+          <td style="color:#666;font-size:13px">${fmt(g.date)}</td>
+          <td style="font-weight:${t1w?600:400};color:${t1w?"#f0f0f0":"#666"}">${g.team1.map(playerEl).join("<br>")}</td>
+          <td style="font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:2px;text-align:center">
+            <span style="color:${t1w?"#C8FF00":"#666"}">${g.score1}</span>
+            <span style="color:#242424;margin:0 6px">:</span>
+            <span style="color:${!t1w?"#C8FF00":"#666"}">${g.score2}</span>
+          </td>
+          <td style="font-weight:${!t1w?600:400};color:${!t1w?"#f0f0f0":"#666"}">${g.team2.map(playerEl).join("<br>")}</td>
+          <td><span class="badge badge-win">${(t1w?g.team1:g.team2).join(" & ")}</span></td>
+          <td><button class="btn btn-danger" onclick="deleteGame('${g.id}')">✕</button></td>
+        </tr>`;
+      }).join("")}
+    </tbody>
+  </table></div>`;
+}
+
+async function deleteGame(id) {
+  if (!confirm("Apagar este jogo?")) return;
+  await api("deleteGame", { id });
+  await loadData();
+}
+
+// ─── PLAYERS ─────────────────────────────────────────────────────────────────
+function renderPlayers() {
+  const core = players.filter(p=>p.type==="habitual");
+  const subs  = players.filter(p=>p.type==="substituto");
+
+  document.getElementById("core-players-list").innerHTML = core.length===0
+    ? `<div style="color:#666;font-size:14px;padding:8px 0">Nenhum jogador habitual.</div>`
+    : core.map(p=>`
+        <div class="player-row">
+          <span style="font-weight:500">${p.name}</span>
+          <div style="display:flex;gap:8px;align-items:center">
+            <span class="tag tag-core">habitual</span>
+            <button class="btn btn-danger" onclick="deletePlayer('${p.name}')">✕</button>
+          </div>
+        </div>`).join("");
+
+  document.getElementById("sub-players-list").innerHTML = subs.length===0
+    ? `<div style="color:#666;font-size:14px;padding:8px 0">Nenhum substituto adicionado.</div>`
+    : subs.map(p=>`
+        <div class="player-row">
+          <span>${p.name}</span>
+          <div style="display:flex;gap:8px;align-items:center">
+            <span class="badge badge-sub">sub</span>
+            <button class="btn btn-danger" onclick="deletePlayer('${p.name}')">✕</button>
+          </div>
+        </div>`).join("");
+}
+
+async function addPlayer() {
+  const name = document.getElementById("new-player-name").value.trim();
+  const type = document.getElementById("new-player-type").value;
+  if (!name) return;
+  if (players.find(p=>p.name===name)) return alert("Jogador já existe.");
+  await api("addPlayer", { name, type });
+  document.getElementById("new-player-name").value = "";
+  await loadData();
+}
+
+async function deletePlayer(name) {
+  if (!confirm(`Apagar "${name}"?`)) return;
+  await api("deletePlayer", { name });
+  await loadData();
+}
+
+// ─── INIT ─────────────────────────────────────────────────────────────────────
+// Update Apps Script to support type field
+loadData();
+</script>
+</body>
+</html>
