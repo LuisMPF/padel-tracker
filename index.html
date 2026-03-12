@@ -3,116 +3,129 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>🎾 Padel Tracker</title>
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<title>Padeleiros</title>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Barlow:wght@400;500;600;700&display=swap" rel="stylesheet"/>
 <style>
-  *{box-sizing:border-box;margin:0;padding:0}
-  body{background:#0a0a0a;color:#f0f0f0;font-family:'DM Sans',sans-serif;min-height:100vh}
-  .nav{display:flex;align-items:center;border-bottom:1px solid #242424;padding:0 24px;background:#0d0d0d;overflow-x:auto}
-  .nav-brand{font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:2px;color:#C8FF00;margin-right:32px;padding:18px 0;white-space:nowrap}
-  .nav-btn{padding:20px 16px;font-size:13px;font-weight:500;color:#666;background:none;border:none;cursor:pointer;border-bottom:2px solid transparent;letter-spacing:.5px;transition:all .2s;text-transform:uppercase;white-space:nowrap}
-  .nav-btn:hover{color:#f0f0f0}.nav-btn.active{color:#C8FF00;border-bottom-color:#C8FF00}
-  .sync-bar{display:flex;align-items:center;gap:8px;padding:8px 24px;font-size:12px;border-bottom:1px solid #242424;background:#0d0d0d}
-  .sync-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
-  .sync-label{color:#666}.sync-label.ok{color:#C8FF00}.sync-label.error{color:#ff6060}.sync-label.syncing{color:#888}
-  .refresh-btn{margin-left:auto;padding:3px 12px;font-size:12px;border-radius:6px;border:1px solid #242424;background:transparent;color:#666;cursor:pointer}
-  .refresh-btn:hover{color:#f0f0f0;border-color:#444}
-  .content{max-width:1100px;margin:0 auto;padding:40px 24px}
-  .page-title{font-family:'Bebas Neue',sans-serif;font-size:42px;letter-spacing:3px;margin-bottom:32px}
-  .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:20px}
-  .grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
-  .card{background:#141414;border:1px solid #242424;border-radius:12px;padding:24px}
-  .card-sm{background:#141414;border:1px solid #242424;border-radius:10px;padding:18px 20px}
-  .card-label{font-size:11px;text-transform:uppercase;letter-spacing:1.5px;color:#666;margin-bottom:8px}
-  .card-value{font-family:'Bebas Neue',sans-serif;font-size:48px;letter-spacing:2px;color:#C8FF00;line-height:1}
-  .card-sub{font-size:13px;color:#666;margin-top:6px}
-  .section-title{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:2px;margin-bottom:16px}
-  .table{width:100%;border-collapse:collapse}
-  .table th{text-align:left;font-size:11px;letter-spacing:1.2px;text-transform:uppercase;color:#666;border-bottom:1px solid #242424;padding:10px 14px;font-weight:500}
-  .table td{padding:13px 14px;font-size:14px;border-bottom:1px solid #1a1a1a}
-  .table tr:last-child td{border-bottom:none}.table tbody tr:hover td{background:#1a1a1a}
-  .badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:12px;font-weight:600}
-  .badge-win{background:rgba(200,255,0,.12);color:#C8FF00}
-  .badge-loss{background:rgba(255,60,60,.12);color:#ff6060}
-  .badge-sub{background:rgba(120,120,255,.13);color:#a0a0ff}
-  .rank{font-family:'Bebas Neue',sans-serif;font-size:18px}
-  .rank-1{color:#C8FF00}.rank-2{color:#aaa}.rank-3{color:#c87533}.rank-n{color:#444}
-  .input{background:#1c1c1c;border:1px solid #242424;border-radius:8px;color:#f0f0f0;font-size:14px;padding:10px 14px;font-family:'DM Sans',sans-serif;outline:none;width:100%;transition:border .2s}
-  .input:focus{border-color:#C8FF00}
-  select.input option{background:#1c1c1c}
-  .btn{padding:11px 24px;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;border:none;transition:all .2s;font-family:'DM Sans',sans-serif}
-  .btn-primary{background:#C8FF00;color:#000}.btn-primary:hover{background:#d4ff1a;transform:translateY(-1px)}
-  .btn-ghost{background:transparent;color:#666;border:1px solid #242424}.btn-ghost:hover{color:#f0f0f0;border-color:#444}
-  .btn-danger{background:transparent;color:#ff6060;border:1px solid #3a1a1a;font-size:12px;padding:6px 14px}.btn-danger:hover{background:#3a1a1a}
-  .form-group{display:flex;flex-direction:column;gap:8px;margin-bottom:20px}
-  .form-label{font-size:12px;text-transform:uppercase;letter-spacing:1px;color:#666;font-weight:500}
-  .team-box{background:#111;border:1px solid #242424;border-radius:10px;padding:18px}
-  .team-box-title{font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:1.5px;margin-bottom:14px;color:#666}
-  .score-box{display:flex;align-items:center;gap:16px;background:#111;border-radius:10px;padding:18px 24px;border:1px solid #242424;margin-bottom:24px}
-  .score-input{width:80px;text-align:center;font-size:24px;font-family:'Bebas Neue',sans-serif;letter-spacing:2px}
-  .score-divider{font-family:'Bebas Neue',sans-serif;font-size:32px;color:#242424}
-  .alert{padding:12px 16px;border-radius:8px;font-size:14px;margin-bottom:20px}
-  .alert-ok{background:rgba(200,255,0,.08);border:1px solid rgba(200,255,0,.2);color:#C8FF00}
-  .alert-err{background:rgba(255,60,60,.08);border:1px solid rgba(255,60,60,.2);color:#ff6060}
-  .empty{text-align:center;padding:60px 20px;color:#666;font-size:14px;line-height:2}
-  .filter-bar{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
-  .filter-label{font-size:12px;text-transform:uppercase;letter-spacing:1px;color:#666}
-  .filter-input{width:150px}
-  .tag{font-size:11px;padding:2px 8px;border-radius:4px;background:#222;color:#666;margin-left:6px}
-  .tag-core{background:rgba(200,255,0,.08);color:rgba(200,255,0,.7)}
-  .highlight-card{border-color:rgba(200,255,0,.2);background:linear-gradient(135deg,#141414,#161e00)}
-  .worst-card{border-color:#2a1a1a}
-  .bar-wrap{display:flex;align-items:center;gap:10px}
-  .bar-bg{flex:1;height:4px;background:#222;border-radius:2px;max-width:80px}
-  .bar-fill{height:100%;border-radius:2px;transition:width .3s}
-  .player-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid #242424}
-  .player-row:last-child{border-bottom:none}
-  .hidden{display:none}
-  .spinner{display:inline-block;width:8px;height:8px;border:2px solid #333;border-top-color:#C8FF00;border-radius:50%;animation:spin .6s linear infinite;flex-shrink:0}
-  @keyframes spin{to{transform:rotate(360deg)}}
-  .loading-screen{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;gap:16px}
-  .loading-title{font-family:'Bebas Neue',sans-serif;font-size:36px;color:#C8FF00;letter-spacing:3px}
-  .loading-spinner{width:28px;height:28px;border:3px solid #222;border-top-color:#C8FF00;border-radius:50%;animation:spin .7s linear infinite}
-  .loading-text{color:#666;font-size:14px}
-  @media(max-width:700px){.grid-2,.grid-4{grid-template-columns:1fr}}
+:root{--orange:#FF5500;--orange-hot:#FF7A00;--red:#CC1100;--bg:#0c0c0c;--bg2:#131313;--bg3:#1a1a1a;--border:#2a2a2a;--border2:#333;--text:#f5f5f5;--muted:#666;--muted2:#444}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:'Barlow',sans-serif;min-height:100vh;overflow-x:hidden}
+.nav{display:flex;align-items:stretch;border-bottom:2px solid var(--border);background:var(--bg2);position:sticky;top:0;z-index:100;box-shadow:0 4px 24px rgba(0,0,0,.5)}
+.nav-brand{display:flex;align-items:center;gap:10px;padding:0 24px;border-right:2px solid var(--border);cursor:pointer}
+.nav-brand-text{font-family:'Anton',sans-serif;font-size:22px;letter-spacing:3px;white-space:nowrap;background:linear-gradient(90deg,#fff,var(--orange));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.nav-links{display:flex;align-items:stretch;overflow-x:auto;flex:1}
+.nav-btn{padding:0 20px;font-size:12px;font-weight:700;color:var(--muted);background:none;border:none;cursor:pointer;border-bottom:3px solid transparent;letter-spacing:1.5px;transition:all .2s;text-transform:uppercase;white-space:nowrap;font-family:'Barlow',sans-serif}
+.nav-btn:hover{color:var(--text);background:rgba(255,85,0,.05)}
+.nav-btn.active{color:var(--orange);border-bottom-color:var(--orange)}
+.sync-pill{display:flex;align-items:center;gap:6px;margin:auto 16px auto auto;padding:5px 12px;border-radius:20px;border:1px solid var(--border);font-size:11px;font-weight:600;cursor:pointer;background:var(--bg3);transition:all .2s;white-space:nowrap}
+.sync-pill:hover{border-color:var(--border2)}
+.sync-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.content{max-width:1140px;margin:0 auto;padding:36px 24px}
+.page-header{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:32px;flex-wrap:wrap;gap:16px}
+.page-title{font-family:'Anton',sans-serif;font-size:44px;letter-spacing:4px;text-transform:uppercase;line-height:1;background:linear-gradient(90deg,#fff 60%,var(--orange));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px}
+.stat-card{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:20px;position:relative;overflow:hidden}
+.stat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--red),var(--orange))}
+.stat-card.best::before{background:linear-gradient(90deg,var(--orange),var(--orange-hot))}
+.stat-card.worst::before{background:linear-gradient(90deg,#333,#555)}
+.stat-label{font-size:10px;text-transform:uppercase;letter-spacing:2px;color:var(--muted);margin-bottom:10px;font-weight:700}
+.stat-value{font-family:'Anton',sans-serif;font-size:52px;letter-spacing:2px;color:var(--orange);line-height:1}
+.stat-name{font-size:14px;font-weight:700;color:var(--text);margin-top:6px;line-height:1.3}
+.stat-sub{font-size:12px;color:var(--muted);margin-top:4px}
+.section{background:var(--bg2);border:1px solid var(--border);border-radius:12px;margin-bottom:24px;overflow:hidden}
+.section-header{padding:16px 24px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px}
+.section-title{font-family:'Anton',sans-serif;font-size:17px;letter-spacing:2px;text-transform:uppercase}
+.section-accent{width:4px;height:20px;background:linear-gradient(180deg,var(--red),var(--orange));border-radius:2px;flex-shrink:0}
+.table{width:100%;border-collapse:collapse}
+.table th{text-align:left;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);border-bottom:1px solid var(--border);padding:11px 20px;font-weight:700}
+.table td{padding:13px 20px;font-size:14px;border-bottom:1px solid #1c1c1c}
+.table tr:last-child td{border-bottom:none}
+.table tbody tr:hover td{background:rgba(255,85,0,.04)}
+.rank{font-family:'Anton',sans-serif;font-size:20px}
+.rank-1{color:var(--orange)}.rank-2{color:#bbb}.rank-3{color:#c87533}.rank-n{color:var(--muted2)}
+.badge{display:inline-flex;align-items:center;padding:3px 10px;border-radius:4px;font-size:12px;font-weight:700;letter-spacing:.5px}
+.badge-win{background:rgba(255,85,0,.15);color:var(--orange);border:1px solid rgba(255,85,0,.2)}
+.badge-loss{background:rgba(136,136,136,.1);color:#888;border:1px solid rgba(136,136,136,.15)}
+.badge-sub{background:rgba(100,150,255,.1);color:#7aafff;border:1px solid rgba(100,150,255,.15)}
+.badge-core{background:rgba(255,85,0,.08);color:rgba(255,150,50,.8);border:1px solid rgba(255,85,0,.15)}
+.tag{font-size:10px;padding:2px 7px;border-radius:3px;background:#1e1e1e;color:var(--muted);margin-left:6px;letter-spacing:.5px;font-weight:600}
+.bar-wrap{display:flex;align-items:center;gap:10px}
+.bar-bg{flex:1;height:5px;background:#222;border-radius:3px;max-width:90px}
+.bar-fill{height:100%;border-radius:3px}
+.form-group{display:flex;flex-direction:column;gap:8px;margin-bottom:20px}
+.form-label{font-size:11px;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);font-weight:700}
+.input{background:#181818;border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:14px;padding:11px 16px;font-family:'Barlow',sans-serif;font-weight:500;outline:none;width:100%;transition:border .2s,box-shadow .2s}
+.input:focus{border-color:var(--orange);box-shadow:0 0 0 3px rgba(255,85,0,.1)}
+select.input option{background:#181818}
+.team-box{background:#111;border:2px solid var(--border);border-radius:10px;padding:20px}
+.team-box-title{font-family:'Anton',sans-serif;font-size:14px;letter-spacing:2px;margin-bottom:14px;text-transform:uppercase}
+.score-box{display:flex;align-items:center;gap:20px;background:#111;border-radius:10px;padding:20px 28px;border:2px solid var(--border);margin-bottom:26px}
+.score-input{width:90px;text-align:center;font-size:28px;font-family:'Anton',sans-serif;letter-spacing:2px}
+.score-vs{font-family:'Anton',sans-serif;font-size:36px;color:var(--border2)}
+.btn{padding:12px 26px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;border:none;transition:all .2s;font-family:'Barlow',sans-serif;letter-spacing:1px;text-transform:uppercase}
+.btn-primary{background:linear-gradient(135deg,var(--red),var(--orange));color:#fff;box-shadow:0 4px 16px rgba(255,85,0,.3)}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 6px 24px rgba(255,85,0,.4)}
+.btn-ghost{background:transparent;color:var(--muted);border:1px solid var(--border)}
+.btn-ghost:hover{color:var(--text);border-color:var(--border2)}
+.btn-danger{background:transparent;color:#cc4444;border:1px solid #2a1515;font-size:11px;padding:5px 12px}
+.btn-danger:hover{background:#1e1010}
+.alert{padding:13px 18px;border-radius:8px;font-size:14px;font-weight:500;margin-bottom:22px}
+.alert-ok{background:rgba(255,85,0,.08);border:1px solid rgba(255,85,0,.25);color:var(--orange)}
+.alert-err{background:rgba(200,40,40,.08);border:1px solid rgba(200,40,40,.2);color:#e06060}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.filter-bar{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.filter-label{font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);font-weight:700}
+.empty{text-align:center;padding:70px 20px;color:var(--muted);font-size:15px;line-height:2.5}
+.player-row{display:flex;align-items:center;justify-content:space-between;padding:13px 0;border-bottom:1px solid var(--border)}
+.player-row:last-child{border-bottom:none}
+.loading-screen{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;gap:20px;background:var(--bg)}
+.loading-logo{font-family:'Anton',sans-serif;font-size:48px;letter-spacing:6px;background:linear-gradient(135deg,#fff,var(--orange));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.loading-sub{color:var(--muted);font-size:12px;letter-spacing:2px;text-transform:uppercase;font-weight:700}
+.spinner{width:30px;height:30px;border:3px solid #222;border-top-color:var(--orange);border-radius:50%;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.spin-small{display:inline-block;width:7px;height:7px;border:2px solid #333;border-top-color:var(--orange);border-radius:50%;animation:spin .6s linear infinite;flex-shrink:0}
+.hidden{display:none!important}
+@media(max-width:900px){.stat-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:600px){.grid-2,.stat-grid{grid-template-columns:1fr}.page-title{font-size:34px}}
 </style>
 </head>
 <body>
 
-<!-- LOADING -->
 <div id="loading-screen" class="loading-screen">
-  <div class="loading-title">🎾 PADEL</div>
-  <div class="loading-spinner"></div>
-  <div class="loading-text">A carregar dados do Google Sheets...</div>
+  <div class="loading-logo">🎾 PADELEIROS</div>
+  <div class="spinner"></div>
+  <div class="loading-sub">A carregar dados...</div>
 </div>
 
-<!-- APP -->
 <div id="app" class="hidden">
   <nav class="nav">
-    <span class="nav-brand">🎾 PADEL</span>
-    <button class="nav-btn active" onclick="showView('dashboard')">Dashboard</button>
-    <button class="nav-btn" onclick="showView('register')">Registar Jogo</button>
-    <button class="nav-btn" onclick="showView('history')">Histórico</button>
-    <button class="nav-btn" onclick="showView('players')">Jogadores</button>
+    <div class="nav-brand" onclick="showView('dashboard')">
+      <span style="font-size:20px">🎾</span>
+      <span class="nav-brand-text">PADELEIROS</span>
+    </div>
+    <div class="nav-links">
+      <button class="nav-btn active" onclick="showView('dashboard')">Dashboard</button>
+      <button class="nav-btn" onclick="showView('register')">Registar Jogo</button>
+      <button class="nav-btn" onclick="showView('history')">Histórico</button>
+      <button class="nav-btn" onclick="showView('players')">Jogadores</button>
+    </div>
+    <div class="sync-pill" onclick="loadData()">
+      <div class="sync-dot" id="sync-dot" style="background:#444"></div>
+      <span id="sync-label" style="color:#666">A ligar...</span>
+    </div>
   </nav>
 
-  <div class="sync-bar">
-    <div class="sync-dot" id="sync-dot" style="background:#666"></div>
-    <span class="sync-label" id="sync-label">A ligar...</span>
-    <button class="refresh-btn" onclick="loadData()">↻ Atualizar</button>
-  </div>
-
   <div class="content">
+
     <!-- DASHBOARD -->
     <div id="view-dashboard">
-      <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:28px;flex-wrap:wrap;gap:12px">
-        <h1 class="page-title" style="margin-bottom:0">Estatísticas</h1>
+      <div class="page-header">
+        <h1 class="page-title">Estatísticas</h1>
         <div class="filter-bar">
           <span class="filter-label">De</span>
-          <input type="date" class="input filter-input" id="filter-from" onchange="renderDashboard()"/>
+          <input type="date" class="input" id="filter-from" onchange="renderDashboard()" style="width:148px"/>
           <span class="filter-label">Até</span>
-          <input type="date" class="input filter-input" id="filter-to" onchange="renderDashboard()"/>
-          <button class="btn btn-ghost" style="padding:8px 14px;font-size:12px" onclick="clearFilters()">Limpar</button>
+          <input type="date" class="input" id="filter-to" onchange="renderDashboard()" style="width:148px"/>
+          <button class="btn btn-ghost" style="padding:9px 16px;font-size:11px" onclick="clearFilters()">Limpar</button>
         </div>
       </div>
       <div id="dashboard-content"></div>
@@ -120,98 +133,104 @@
 
     <!-- REGISTER -->
     <div id="view-register" class="hidden">
-      <h1 class="page-title">Registar Jogo</h1>
+      <div class="page-header"><h1 class="page-title">Registar Jogo</h1></div>
       <div id="register-alert" class="hidden"></div>
-      <div style="max-width:560px">
+      <div style="max-width:580px">
         <div class="form-group">
-          <label class="form-label">Data</label>
+          <label class="form-label">Data do Jogo</label>
           <input type="date" class="input" id="game-date"/>
         </div>
-        <div class="grid-2" style="margin-bottom:20px">
-          <div class="team-box">
-            <div class="team-box-title">Equipa 1</div>
-            <select class="input" id="t1p1" style="margin-bottom:12px"><option value="">Jogador 1</option></select>
-            <select class="input" id="t1p2"><option value="">Jogador 2</option></select>
+        <div class="grid-2" style="margin-bottom:22px">
+          <div class="team-box" style="border-color:rgba(255,85,0,.3)">
+            <div class="team-box-title" style="color:var(--orange)">⬤ Equipa 1</div>
+            <select class="input" id="t1p1" style="margin-bottom:12px"><option value="">Selecionar...</option></select>
+            <select class="input" id="t1p2"><option value="">Selecionar...</option></select>
           </div>
           <div class="team-box">
-            <div class="team-box-title">Equipa 2</div>
-            <select class="input" id="t2p1" style="margin-bottom:12px"><option value="">Jogador 1</option></select>
-            <select class="input" id="t2p2"><option value="">Jogador 2</option></select>
+            <div class="team-box-title" style="color:var(--muted)">◯ Equipa 2</div>
+            <select class="input" id="t2p1" style="margin-bottom:12px"><option value="">Selecionar...</option></select>
+            <select class="input" id="t2p2"><option value="">Selecionar...</option></select>
           </div>
         </div>
         <div class="score-box">
-          <div style="flex:1">
-            <div class="form-label" style="margin-bottom:6px">Equipa 1</div>
+          <div style="flex:1;text-align:center">
+            <div class="form-label" style="margin-bottom:8px">Equipa 1</div>
             <input type="number" min="0" class="input score-input" id="score1" placeholder="0"/>
           </div>
-          <div class="score-divider">—</div>
-          <div style="flex:1">
-            <div class="form-label" style="margin-bottom:6px">Equipa 2</div>
+          <div class="score-vs">—</div>
+          <div style="flex:1;text-align:center">
+            <div class="form-label" style="margin-bottom:8px">Equipa 2</div>
             <input type="number" min="0" class="input score-input" id="score2" placeholder="0"/>
           </div>
         </div>
-        <button class="btn btn-primary" style="width:100%" onclick="registerGame()">Guardar no Google Sheets</button>
+        <button class="btn btn-primary" style="width:100%;padding:15px;font-size:15px" onclick="registerGame()">🎾 Guardar Jogo</button>
       </div>
     </div>
 
     <!-- HISTORY -->
     <div id="view-history" class="hidden">
-      <h1 class="page-title">Histórico</h1>
+      <div class="page-header"><h1 class="page-title">Histórico</h1></div>
       <div id="history-content"></div>
     </div>
 
     <!-- PLAYERS -->
     <div id="view-players" class="hidden">
-      <h1 class="page-title">Jogadores</h1>
-      <div style="max-width:500px">
-        <div class="card" style="margin-bottom:20px">
-          <div class="section-title">Habituais</div>
-          <div id="core-players-list"></div>
+      <div class="page-header"><h1 class="page-title">Jogadores</h1></div>
+      <div style="max-width:520px">
+        <div class="section" style="margin-bottom:20px">
+          <div class="section-header"><div class="section-accent"></div><div class="section-title">Habituais</div></div>
+          <div style="padding:8px 24px 16px" id="core-players-list"></div>
         </div>
-        <div class="card" style="margin-bottom:20px">
-          <div class="section-title">Substitutos</div>
-          <div id="sub-players-list"></div>
+        <div class="section" style="margin-bottom:20px">
+          <div class="section-header"><div class="section-accent" style="background:#555"></div><div class="section-title">Substitutos</div></div>
+          <div style="padding:8px 24px 16px" id="sub-players-list"></div>
         </div>
-        <div class="card">
-          <div class="section-title">Adicionar Jogador</div>
-          <div style="display:flex;gap:10px;margin-bottom:12px">
-            <input class="input" id="new-player-name" placeholder="Nome"/>
-            <select class="input" id="new-player-type" style="width:140px">
-              <option value="habitual">Habitual</option>
-              <option value="substituto">Substituto</option>
-            </select>
-            <button class="btn btn-primary" style="white-space:nowrap" onclick="addPlayer()">Adicionar</button>
+        <div class="section">
+          <div class="section-header"><div class="section-accent" style="background:#444"></div><div class="section-title">Adicionar Jogador</div></div>
+          <div style="padding:20px 24px">
+            <div style="display:flex;gap:10px;flex-wrap:wrap">
+              <input class="input" id="new-player-name" placeholder="Nome" style="flex:1;min-width:140px" onkeydown="if(event.key==='Enter')addPlayer()"/>
+              <select class="input" id="new-player-type" style="width:145px">
+                <option value="habitual">Habitual</option>
+                <option value="substituto">Substituto</option>
+              </select>
+              <button class="btn btn-primary" onclick="addPlayer()">Adicionar</button>
+            </div>
           </div>
         </div>
       </div>
     </div>
+
   </div>
 </div>
 
 <script>
-// ─── CONFIG ───────────────────────────────────────────────────────────────────
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzRuqNsjtxPbuZvybGB9M8Pru_LDzWFLVxE8dJwpy28rUly0IuiyqJPGzscdNJYg5qxDA/exec";
+let games = [], players = [];
 
-// ─── STATE ────────────────────────────────────────────────────────────────────
-let games = [];
-let players = []; // [{name, type}]
-let currentView = "dashboard";
+// ── JSONP — contorna o CORS/redirect do Google ────────────────────────────────
+function jsonp(url) {
+  return new Promise((resolve, reject) => {
+    const cb = "_padelcb_" + Date.now() + "_" + Math.random().toString(36).slice(2);
+    const script = document.createElement("script");
+    const timer = setTimeout(() => {
+      cleanup(); reject(new Error("Timeout — verifica se o script está publicado"));
+    }, 20000);
+    function cleanup() { delete window[cb]; if (script.parentNode) document.body.removeChild(script); }
+    window[cb] = (data) => { clearTimeout(timer); cleanup(); resolve(data); };
+    script.onerror = () => { clearTimeout(timer); cleanup(); reject(new Error("Erro ao carregar script")); };
+    script.src = url + (url.includes("?")?"&":"?") + "callback=" + cb;
+    document.body.appendChild(script);
+  });
+}
 
-// ─── API ──────────────────────────────────────────────────────────────────────
-async function api(action, body = null) {
+async function api(action, body = {}) {
   setSyncStatus("syncing");
   try {
-    let res;
-    if (action === "getAll") {
-      res = await fetch(`${SCRIPT_URL}?action=getAll`);
-    } else {
-      res = await fetch(`${SCRIPT_URL}?action=${action}`, {
-        method: "POST",
-        body: JSON.stringify({ action, ...body })
-      });
-    }
-    const data = await res.json();
-    if (data.error) throw new Error(data.error);
+    let data;
+    const dataParam = Object.keys(body).length ? "&data=" + encodeURIComponent(JSON.stringify(body)) : "";
+    data = await jsonp(`${SCRIPT_URL}?action=${action}${dataParam}`);
+    if (data && data.error) throw new Error(data.error);
     setSyncStatus("ok");
     return data;
   } catch(e) {
@@ -220,20 +239,26 @@ async function api(action, body = null) {
   }
 }
 
-// ─── SYNC STATUS ──────────────────────────────────────────────────────────────
-function setSyncStatus(status) {
+// ── SYNC STATUS ───────────────────────────────────────────────────────────────
+function setSyncStatus(s) {
   const dot = document.getElementById("sync-dot");
-  const label = document.getElementById("sync-label");
-  const colors = { ok:"#C8FF00", error:"#ff6060", syncing:"#888" };
-  const labels = { ok:"Sincronizado com Google Sheets", error:"Erro de ligação ao Google Sheets", syncing:"A sincronizar..." };
-  dot.style.background = colors[status];
-  label.textContent = labels[status];
-  label.className = `sync-label ${status}`;
-  // replace dot with spinner when syncing
-  dot.style.display = status === "syncing" ? "none" : "block";
+  const lbl = document.getElementById("sync-label");
+  const c = {ok:"#FF5500",error:"#cc4444",syncing:"#888"};
+  const t = {ok:"Sincronizado",error:"Erro de ligação",syncing:"A sincronizar..."};
+  if (s === "syncing") {
+    dot.style.display = "none";
+    dot.insertAdjacentHTML("afterend", `<span class="spin-small" id="sync-spin"></span>`);
+  } else {
+    const sp = document.getElementById("sync-spin");
+    if (sp) sp.remove();
+    dot.style.display = "block";
+  }
+  dot.style.background = c[s]||"#444";
+  lbl.textContent = t[s]||"";
+  lbl.style.color = c[s]||"#666";
 }
 
-// ─── LOAD DATA ────────────────────────────────────────────────────────────────
+// ── LOAD ──────────────────────────────────────────────────────────────────────
 async function loadData() {
   try {
     const data = await api("getAll");
@@ -244,270 +269,201 @@ async function loadData() {
     document.getElementById("app").classList.remove("hidden");
   } catch(e) {
     document.getElementById("loading-screen").innerHTML = `
-      <div class="loading-title">🎾 PADEL</div>
-      <div style="color:#ff6060;font-size:14px;text-align:center;max-width:400px">
-        Erro ao ligar ao Google Sheets.<br>Verifica se o script está publicado corretamente.<br><br>
-        <button class="btn btn-primary" onclick="loadData()">Tentar novamente</button>
+      <div class="loading-logo">🎾 PADELEIROS</div>
+      <div style="color:#e06060;font-size:14px;text-align:center;max-width:400px;line-height:1.9">
+        <strong>Erro ao ligar ao Google Sheets</strong><br><br>
+        ${e.message}<br><br>
+        Confirma que o Apps Script está publicado como<br><em>"Qualquer pessoa"</em> e republicado com nova versão.
+        <br><br>
+        <button class="btn btn-primary" onclick="loadData()" style="margin-top:8px">↻ Tentar novamente</button>
       </div>`;
   }
 }
 
-// ─── VIEWS ────────────────────────────────────────────────────────────────────
-function showView(view) {
-  currentView = view;
-  ["dashboard","register","history","players"].forEach(v => {
-    document.getElementById(`view-${v}`).classList.toggle("hidden", v !== view);
-  });
-  document.querySelectorAll(".nav-btn").forEach((btn, i) => {
-    btn.classList.toggle("active", ["dashboard","register","history","players"][i] === view);
-  });
+// ── VIEWS ─────────────────────────────────────────────────────────────────────
+function showView(v) {
+  ["dashboard","register","history","players"].forEach(x =>
+    document.getElementById("view-"+x).classList.toggle("hidden", x!==v));
+  document.querySelectorAll(".nav-btn").forEach((b,i) =>
+    b.classList.toggle("active", ["dashboard","register","history","players"][i]===v));
   renderAll();
 }
+function renderAll(){ renderDashboard(); renderHistory(); renderPlayers(); populateSelects(); }
 
-function renderAll() {
-  renderDashboard();
-  renderHistory();
-  renderPlayers();
-  populateSelects();
+// ── DASHBOARD ─────────────────────────────────────────────────────────────────
+function getFiltered() {
+  const f = document.getElementById("filter-from").value;
+  const t = document.getElementById("filter-to").value;
+  return games.filter(g=>(!f||g.date>=f)&&(!t||g.date<=t));
 }
+function clearFilters(){ document.getElementById("filter-from").value=""; document.getElementById("filter-to").value=""; renderDashboard(); }
 
-// ─── DASHBOARD ────────────────────────────────────────────────────────────────
-function getFilteredGames() {
-  const from = document.getElementById("filter-from").value;
-  const to = document.getElementById("filter-to").value;
-  return games.filter(g => (!from || g.date >= from) && (!to || g.date <= to));
-}
-
-function clearFilters() {
-  document.getElementById("filter-from").value = "";
-  document.getElementById("filter-to").value = "";
-  renderDashboard();
-}
-
-function computeStats(filteredGames) {
-  const wins={}, losses={}, played={}, pairWins={}, pairGames={}, streaks={}, curStreak={};
-
-  const allNames = [...new Set([...players.map(p=>p.name), ...filteredGames.flatMap(g=>[...g.team1,...g.team2])])];
-  allNames.forEach(p => { wins[p]=0;losses[p]=0;played[p]=0;streaks[p]=0;curStreak[p]=0; });
-
-  [...filteredGames].sort((a,b)=>a.date.localeCompare(b.date)).forEach(g => {
-    const t1w = parseInt(g.score1) > parseInt(g.score2);
-    const winner = t1w ? g.team1 : g.team2;
-    const loser  = t1w ? g.team2 : g.team1;
-    winner.forEach(p => { wins[p]=(wins[p]||0)+1; played[p]=(played[p]||0)+1; curStreak[p]=(curStreak[p]||0)+1; if(curStreak[p]>(streaks[p]||0)) streaks[p]=curStreak[p]; });
-    loser.forEach(p  => { losses[p]=(losses[p]||0)+1; played[p]=(played[p]||0)+1; curStreak[p]=0; });
-    const wp=[...winner].sort().join(" & "), lp=[...loser].sort().join(" & ");
-    pairWins[wp]=(pairWins[wp]||0)+1;
-    pairGames[wp]=(pairGames[wp]||0)+1;
-    pairGames[lp]=(pairGames[lp]||0)+1;
+function computeStats(fg) {
+  const wins={},losses={},played={},pairWins={},pairGames={},streaks={},cur={};
+  [...new Set([...players.map(p=>p.name),...fg.flatMap(g=>[...g.team1,...g.team2])])].forEach(p=>{wins[p]=0;losses[p]=0;played[p]=0;streaks[p]=0;cur[p]=0;});
+  [...fg].sort((a,b)=>a.date.localeCompare(b.date)).forEach(g=>{
+    const t1w=parseInt(g.score1)>parseInt(g.score2);
+    const W=t1w?g.team1:g.team2,L=t1w?g.team2:g.team1;
+    W.forEach(p=>{wins[p]=(wins[p]||0)+1;played[p]=(played[p]||0)+1;cur[p]=(cur[p]||0)+1;if(cur[p]>(streaks[p]||0))streaks[p]=cur[p];});
+    L.forEach(p=>{losses[p]=(losses[p]||0)+1;played[p]=(played[p]||0)+1;cur[p]=0;});
+    const wp=[...W].sort().join(" & "),lp=[...L].sort().join(" & ");
+    pairWins[wp]=(pairWins[wp]||0)+1;pairGames[wp]=(pairGames[wp]||0)+1;pairGames[lp]=(pairGames[lp]||0)+1;
   });
-
-  const pairRate = {};
-  Object.keys(pairGames).forEach(p => pairRate[p] = ((pairWins[p]||0)/pairGames[p])*100);
-  const sortedPairs = Object.entries(pairRate).sort((a,b)=>b[1]-a[1]);
-
-  return { wins, losses, played, streaks, curStreak, pairWins, pairGames, pairRate, bestPair: sortedPairs[0]||null, worstPair: sortedPairs.length>1?sortedPairs[sortedPairs.length-1]:null };
+  const pr={};Object.keys(pairGames).forEach(p=>pr[p]=((pairWins[p]||0)/pairGames[p])*100);
+  const sp=Object.entries(pr).sort((a,b)=>b[1]-a[1]);
+  return{wins,losses,played,streaks,cur,pairWins,pairGames,pr,best:sp[0]||null,worst:sp.length>1?sp[sp.length-1]:null};
 }
 
-function renderDashboard() {
-  const el = document.getElementById("dashboard-content");
-  const fg = getFilteredGames();
-  if (fg.length === 0) {
-    el.innerHTML = `<div class="empty">Nenhum jogo registado ainda.<br>Começa por registar um jogo! 🏓</div>`;
-    return;
-  }
+function isCore(n){return players.find(p=>p.name===n)?.type==="habitual";}
+function rankCls(i){return i===0?"rank rank-1":i===1?"rank rank-2":i===2?"rank rank-3":"rank rank-n";}
 
-  const s = computeStats(fg);
-  const leaderboard = [...new Set([...players.map(p=>p.name), ...Object.keys(s.wins)])]
-    .map(n => ({ name:n, wins:s.wins[n]||0, losses:s.losses[n]||0, games:s.played[n]||0, streak:s.streaks[n]||0, cur:s.curStreak[n]||0 }))
-    .filter(p => p.games > 0)
-    .sort((a,b) => b.wins-a.wins || a.losses-b.losses);
+function renderDashboard(){
+  const el=document.getElementById("dashboard-content");
+  const fg=getFiltered();
+  if(!fg.length){el.innerHTML=`<div class="empty">🏓<br><br>Nenhum jogo registado ainda.<br>Vai a <strong>Registar Jogo</strong> para começar!</div>`;return;}
+  const s=computeStats(fg);
+  const lb=[...new Set([...players.map(p=>p.name),...Object.keys(s.wins)])]
+    .map(n=>({name:n,wins:s.wins[n]||0,losses:s.losses[n]||0,games:s.played[n]||0,streak:s.streaks[n]||0,cur:s.cur[n]||0}))
+    .filter(p=>p.games>0).sort((a,b)=>b.wins-a.wins||a.losses-b.losses);
 
-  const isCore = n => players.find(p=>p.name===n)?.type === "habitual";
-
-  const rankClass = i => i===0?"rank rank-1":i===1?"rank rank-2":i===2?"rank rank-3":"rank rank-n";
-
-  el.innerHTML = `
-    <div class="grid-4" style="margin-bottom:24px">
-      <div class="card-sm"><div class="card-label">Total de jogos</div><div class="card-value">${fg.length}</div></div>
-      <div class="card-sm"><div class="card-label">Jogadores ativos</div><div class="card-value">${leaderboard.length}</div></div>
-      <div class="card-sm highlight-card">
-        <div class="card-label">Melhor dupla</div>
-        ${s.bestPair ? `<div style="font-size:14px;font-weight:600;color:#C8FF00;margin-top:4px">${s.bestPair[0]}</div><div class="card-sub">${s.pairWins[s.bestPair[0]]||0}V — ${Math.round(s.bestPair[1])}% vitórias</div>` : `<div class="card-sub">—</div>`}
-      </div>
-      <div class="card-sm worst-card">
-        <div class="card-label">Pior dupla</div>
-        ${s.worstPair ? `<div style="font-size:14px;font-weight:600;color:#ff6060;margin-top:4px">${s.worstPair[0]}</div><div class="card-sub">${s.pairWins[s.worstPair[0]]||0}V — ${Math.round(s.worstPair[1])}% vitórias</div>` : `<div class="card-sub">—</div>`}
-      </div>
+  el.innerHTML=`
+    <div class="stat-grid">
+      <div class="stat-card"><div class="stat-label">Total de jogos</div><div class="stat-value">${fg.length}</div><div class="stat-sub">jogos registados</div></div>
+      <div class="stat-card"><div class="stat-label">Jogadores ativos</div><div class="stat-value">${lb.length}</div><div class="stat-sub">no período</div></div>
+      <div class="stat-card best"><div class="stat-label">🔥 Melhor dupla</div>${s.best?`<div class="stat-name">${s.best[0]}</div><div class="stat-sub">${s.pairWins[s.best[0]]||0}V · ${Math.round(s.best[1])}%</div>`:`<div class="stat-sub" style="margin-top:14px">—</div>`}</div>
+      <div class="stat-card worst"><div class="stat-label">😬 Pior dupla</div>${s.worst?`<div class="stat-name" style="color:#888">${s.worst[0]}</div><div class="stat-sub">${s.pairWins[s.worst[0]]||0}V · ${Math.round(s.worst[1])}%</div>`:`<div class="stat-sub" style="margin-top:14px">—</div>`}</div>
     </div>
-
-    <div class="card" style="margin-bottom:24px">
-      <div class="section-title">Classificação</div>
+    <div class="section" style="margin-bottom:24px">
+      <div class="section-header"><div class="section-accent"></div><div class="section-title">Classificação</div></div>
       <table class="table">
-        <thead><tr><th>#</th><th>Jogador</th><th>Jogos</th><th>Vitórias</th><th>Derrotas</th><th>% Vitórias</th><th>Streak atual</th><th>Record streak</th></tr></thead>
-        <tbody>
-          ${leaderboard.map((p,i) => `
-            <tr>
-              <td><span class="${rankClass(i)}">${i+1}</span></td>
-              <td style="font-weight:500">${p.name}${!isCore(p.name)?`<span class="tag">sub</span>`:""}</td>
-              <td>${p.games}</td>
-              <td><span class="badge badge-win">${p.wins}</span></td>
-              <td><span class="badge badge-loss">${p.losses}</span></td>
-              <td>${p.games>0?Math.round((p.wins/p.games)*100)+"%":"—"}</td>
-              <td>${p.cur>0?`<span style="color:#C8FF00;font-weight:600">🔥 ${p.cur}</span>`:`<span style="color:#444">—</span>`}</td>
-              <td style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:${p.streak>=3?"#C8FF00":"#f0f0f0"}">${p.streak}</td>
-            </tr>`).join("")}
-        </tbody>
+        <thead><tr><th>#</th><th>Jogador</th><th>Jogos</th><th>Vitórias</th><th>Derrotas</th><th>% Vitórias</th><th>Streak atual</th><th>Record</th></tr></thead>
+        <tbody>${lb.map((p,i)=>`<tr>
+          <td><span class="${rankCls(i)}">${i+1}</span></td>
+          <td style="font-weight:600">${p.name}${!isCore(p.name)?`<span class="tag">sub</span>`:""}</td>
+          <td style="color:var(--muted)">${p.games}</td>
+          <td><span class="badge badge-win">${p.wins}</span></td>
+          <td><span class="badge badge-loss">${p.losses}</span></td>
+          <td style="font-weight:700">${p.games?Math.round(p.wins/p.games*100)+"%":"—"}</td>
+          <td>${p.cur>0?`<span style="color:var(--orange);font-weight:700">🔥 ${p.cur}</span>`:`<span style="color:var(--muted2)">—</span>`}</td>
+          <td style="font-family:'Anton',sans-serif;font-size:22px;color:${p.streak>=3?"var(--orange)":"var(--muted)"}">${p.streak||"—"}</td>
+        </tr>`).join("")}</tbody>
       </table>
     </div>
-
-    <div class="card">
-      <div class="section-title">Duplas</div>
-      ${Object.keys(s.pairGames).length===0?`<div class="empty">Sem dados suficientes.</div>`:`
+    <div class="section">
+      <div class="section-header"><div class="section-accent"></div><div class="section-title">Duplas</div></div>
+      ${!Object.keys(s.pairGames).length?`<div class="empty" style="padding:40px">Sem dados.</div>`:`
       <table class="table">
         <thead><tr><th>Dupla</th><th>Jogos</th><th>Vitórias</th><th>% Vitórias</th></tr></thead>
-        <tbody>
-          ${Object.entries(s.pairRate).sort((a,b)=>b[1]-a[1]).map(([pair,rate])=>`
-            <tr>
-              <td style="font-weight:500">${pair}</td>
-              <td>${s.pairGames[pair]}</td>
-              <td><span class="badge badge-win">${s.pairWins[pair]||0}</span></td>
-              <td><div class="bar-wrap"><div class="bar-bg"><div class="bar-fill" style="width:${rate}%;background:${rate>=60?"#C8FF00":rate>=40?"#888":"#ff6060"}"></div></div><span style="font-size:13px;color:${rate>=60?"#C8FF00":rate<40?"#ff6060":"#f0f0f0"}">${Math.round(rate)}%</span></div></td>
-            </tr>`).join("")}
-        </tbody>
+        <tbody>${Object.entries(s.pr).sort((a,b)=>b[1]-a[1]).map(([pair,rate])=>`<tr>
+          <td style="font-weight:600">${pair}</td>
+          <td style="color:var(--muted)">${s.pairGames[pair]}</td>
+          <td><span class="badge badge-win">${s.pairWins[pair]||0}</span></td>
+          <td><div class="bar-wrap"><div class="bar-bg"><div class="bar-fill" style="width:${rate}%;background:${rate>=60?"var(--orange)":rate>=40?"#666":"#553333"}"></div></div>
+          <span style="font-size:13px;font-weight:700;color:${rate>=60?"var(--orange)":rate<40?"#888":"var(--text)"}">${Math.round(rate)}%</span></div></td>
+        </tr>`).join("")}</tbody>
       </table>`}
     </div>`;
 }
 
-// ─── REGISTER GAME ────────────────────────────────────────────────────────────
-function populateSelects() {
-  const selects = ["t1p1","t1p2","t2p1","t2p2"];
-  selects.forEach((id,i) => {
-    const sel = document.getElementById(id);
-    const cur = sel.value;
-    const labels = ["Jogador 1","Jogador 2","Jogador 1","Jogador 2"];
-    sel.innerHTML = `<option value="">${labels[i]}</option>` +
-      players.map(p=>`<option value="${p.name}"${p.name===cur?" selected":""}>${p.name}${p.type==="substituto"?" (sub)":""}</option>`).join("");
+// ── REGISTER ──────────────────────────────────────────────────────────────────
+function populateSelects(){
+  const ph=["Jogador 1","Jogador 2","Jogador 1","Jogador 2"];
+  ["t1p1","t1p2","t2p1","t2p2"].forEach((id,i)=>{
+    const sel=document.getElementById(id),cur=sel.value;
+    sel.innerHTML=`<option value="">— ${ph[i]} —</option>`+players.map(p=>`<option value="${p.name}"${p.name===cur?" selected":""}>${p.name}${p.type==="substituto"?" (sub)":""}</option>`).join("");
   });
-  const dateEl = document.getElementById("game-date");
-  if (!dateEl.value) dateEl.value = new Date().toISOString().slice(0,10);
+  const d=document.getElementById("game-date");if(!d.value)d.value=new Date().toISOString().slice(0,10);
 }
 
-function showAlert(msg, type) {
-  const el = document.getElementById("register-alert");
-  el.className = `alert alert-${type}`;
-  el.textContent = msg;
-  el.classList.remove("hidden");
-  if (type === "ok") setTimeout(()=>el.classList.add("hidden"), 3000);
+function showAlert(msg,type){
+  const el=document.getElementById("register-alert");
+  el.className=`alert alert-${type}`;el.textContent=msg;el.classList.remove("hidden");
+  if(type==="ok")setTimeout(()=>el.classList.add("hidden"),3500);
 }
 
-async function registerGame() {
-  const t1 = [document.getElementById("t1p1").value, document.getElementById("t1p2").value];
-  const t2 = [document.getElementById("t2p1").value, document.getElementById("t2p2").value];
-  const s1 = document.getElementById("score1").value;
-  const s2 = document.getElementById("score2").value;
-  const date = document.getElementById("game-date").value;
-
-  if (!t1[0]||!t1[1]||!t2[0]||!t2[1]) return showAlert("Seleciona todos os jogadores.", "err");
-  if (t1[0]===t1[1]||t2[0]===t2[1]) return showAlert("Um jogador não pode jogar consigo mesmo.", "err");
-  if (new Set([...t1,...t2]).size!==4) return showAlert("O mesmo jogador não pode estar em ambas as equipas.", "err");
-  if (s1===""||s2==="") return showAlert("Insere os resultados.", "err");
-  if (parseInt(s1)===parseInt(s2)) return showAlert("O resultado não pode ser empate.", "err");
-
-  try {
-    await api("addGame", { game: { date, team1:t1, team2:t2, score1:s1, score2:s2 } });
+async function registerGame(){
+  const t1=[document.getElementById("t1p1").value,document.getElementById("t1p2").value];
+  const t2=[document.getElementById("t2p1").value,document.getElementById("t2p2").value];
+  const s1=document.getElementById("score1").value,s2=document.getElementById("score2").value;
+  const date=document.getElementById("game-date").value;
+  if(!t1[0]||!t1[1]||!t2[0]||!t2[1]) return showAlert("Seleciona todos os jogadores.","err");
+  if(t1[0]===t1[1]||t2[0]===t2[1]) return showAlert("Um jogador não pode jogar consigo mesmo.","err");
+  if(new Set([...t1,...t2]).size!==4) return showAlert("O mesmo jogador não pode estar em ambas as equipas.","err");
+  if(s1===""||s2==="") return showAlert("Insere os resultados.","err");
+  if(parseInt(s1)===parseInt(s2)) return showAlert("O resultado não pode ser empate.","err");
+  try{
+    await api("addGame",{game:{date,team1:t1,team2:t2,score1:s1,score2:s2}});
     await loadData();
-    document.getElementById("t1p1").value="";document.getElementById("t1p2").value="";
-    document.getElementById("t2p1").value="";document.getElementById("t2p2").value="";
-    document.getElementById("score1").value="";document.getElementById("score2").value="";
-    showAlert("Jogo guardado no Google Sheets! ✅", "ok");
-  } catch(e) {
-    showAlert("Erro ao guardar. Verifica a ligação.", "err");
-  }
+    ["t1p1","t1p2","t2p1","t2p2","score1","score2"].forEach(id=>document.getElementById(id).value="");
+    showAlert("🎾 Jogo guardado com sucesso!","ok");
+  }catch(e){showAlert("Erro ao guardar: "+e.message,"err");}
 }
 
-// ─── HISTORY ─────────────────────────────────────────────────────────────────
-function renderHistory() {
-  const el = document.getElementById("history-content");
-  if (games.length===0) { el.innerHTML=`<div class="empty">Nenhum jogo registado ainda.</div>`; return; }
-  const isCore = n => players.find(p=>p.name===n)?.type==="habitual";
-  const sorted = [...games].sort((a,b)=>b.date.localeCompare(a.date));
-  el.innerHTML = `<div class="card"><table class="table">
-    <thead><tr><th>Data</th><th>Equipa 1</th><th>Resultado</th><th>Equipa 2</th><th>Vencedor</th><th></th></tr></thead>
-    <tbody>
-      ${sorted.map(g => {
-        const t1w = parseInt(g.score1)>parseInt(g.score2);
-        const fmt = d => new Date(d).toLocaleDateString("pt-PT",{day:"2-digit",month:"2-digit",year:"numeric"});
-        const playerEl = (n) => n + (!isCore(n)?`<span class="tag">sub</span>`:"");
-        return `<tr>
-          <td style="color:#666;font-size:13px">${fmt(g.date)}</td>
-          <td style="font-weight:${t1w?600:400};color:${t1w?"#f0f0f0":"#666"}">${g.team1.map(playerEl).join("<br>")}</td>
-          <td style="font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:2px;text-align:center">
-            <span style="color:${t1w?"#C8FF00":"#666"}">${g.score1}</span>
-            <span style="color:#242424;margin:0 6px">:</span>
-            <span style="color:${!t1w?"#C8FF00":"#666"}">${g.score2}</span>
-          </td>
-          <td style="font-weight:${!t1w?600:400};color:${!t1w?"#f0f0f0":"#666"}">${g.team2.map(playerEl).join("<br>")}</td>
-          <td><span class="badge badge-win">${(t1w?g.team1:g.team2).join(" & ")}</span></td>
-          <td><button class="btn btn-danger" onclick="deleteGame('${g.id}')">✕</button></td>
-        </tr>`;
-      }).join("")}
-    </tbody>
+// ── HISTORY ───────────────────────────────────────────────────────────────────
+function renderHistory(){
+  const el=document.getElementById("history-content");
+  if(!games.length){el.innerHTML=`<div class="empty">📋<br><br>Nenhum jogo registado ainda.</div>`;return;}
+  const fmt=d=>{try{return new Date(d+"T12:00:00").toLocaleDateString("pt-PT",{day:"2-digit",month:"2-digit",year:"numeric"});}catch{return d;}};
+  const sorted=[...games].sort((a,b)=>String(b.date).localeCompare(String(a.date)));
+  el.innerHTML=`<div class="section"><table class="table">
+    <thead><tr><th>Data</th><th>Equipa 1</th><th style="text-align:center">Result.</th><th>Equipa 2</th><th>Vencedor</th><th></th></tr></thead>
+    <tbody>${sorted.map(g=>{
+      const t1w=parseInt(g.score1)>parseInt(g.score2);
+      const pEl=n=>n+(!isCore(n)?`<span class="tag">sub</span>`:"");
+      return`<tr>
+        <td style="color:var(--muted);font-size:13px;white-space:nowrap">${fmt(g.date)}</td>
+        <td style="font-weight:${t1w?700:400};color:${t1w?"var(--text)":"var(--muted)"}">${g.team1.map(pEl).join("<br>")}</td>
+        <td style="font-family:'Anton',sans-serif;font-size:22px;letter-spacing:2px;text-align:center">
+          <span style="color:${t1w?"var(--orange)":"var(--muted)"}">${g.score1}</span>
+          <span style="color:var(--muted2);margin:0 5px">·</span>
+          <span style="color:${!t1w?"var(--orange)":"var(--muted)"}">${g.score2}</span>
+        </td>
+        <td style="font-weight:${!t1w?700:400};color:${!t1w?"var(--text)":"var(--muted)"}">${g.team2.map(pEl).join("<br>")}</td>
+        <td><span class="badge badge-win">${(t1w?g.team1:g.team2).join(" & ")}</span></td>
+        <td><button class="btn btn-danger" onclick="deleteGame('${g.id}')">✕</button></td>
+      </tr>`;
+    }).join("")}</tbody>
   </table></div>`;
 }
 
-async function deleteGame(id) {
-  if (!confirm("Apagar este jogo?")) return;
-  await api("deleteGame", { id });
+async function deleteGame(id){
+  if(!confirm("Apagar este jogo?"))return;
+  await api("deleteGame",{id});
   await loadData();
 }
 
-// ─── PLAYERS ─────────────────────────────────────────────────────────────────
-function renderPlayers() {
-  const core = players.filter(p=>p.type==="habitual");
-  const subs  = players.filter(p=>p.type==="substituto");
-
-  document.getElementById("core-players-list").innerHTML = core.length===0
-    ? `<div style="color:#666;font-size:14px;padding:8px 0">Nenhum jogador habitual.</div>`
-    : core.map(p=>`
-        <div class="player-row">
-          <span style="font-weight:500">${p.name}</span>
-          <div style="display:flex;gap:8px;align-items:center">
-            <span class="tag tag-core">habitual</span>
-            <button class="btn btn-danger" onclick="deletePlayer('${p.name}')">✕</button>
-          </div>
-        </div>`).join("");
-
-  document.getElementById("sub-players-list").innerHTML = subs.length===0
-    ? `<div style="color:#666;font-size:14px;padding:8px 0">Nenhum substituto adicionado.</div>`
-    : subs.map(p=>`
-        <div class="player-row">
-          <span>${p.name}</span>
-          <div style="display:flex;gap:8px;align-items:center">
-            <span class="badge badge-sub">sub</span>
-            <button class="btn btn-danger" onclick="deletePlayer('${p.name}')">✕</button>
-          </div>
-        </div>`).join("");
+// ── PLAYERS ───────────────────────────────────────────────────────────────────
+function renderPlayers(){
+  const core=players.filter(p=>p.type==="habitual");
+  const subs=players.filter(p=>p.type==="substituto");
+  document.getElementById("core-players-list").innerHTML=!core.length
+    ?`<div style="color:var(--muted);font-size:14px;padding:10px 0">Nenhum jogador habitual.</div>`
+    :core.map(p=>`<div class="player-row"><span style="font-weight:600">${p.name}</span>
+      <div style="display:flex;gap:8px;align-items:center"><span class="badge badge-core">habitual</span>
+      <button class="btn btn-danger" onclick="deletePlayer('${p.name}')">✕</button></div></div>`).join("");
+  document.getElementById("sub-players-list").innerHTML=!subs.length
+    ?`<div style="color:var(--muted);font-size:14px;padding:10px 0">Nenhum substituto.</div>`
+    :subs.map(p=>`<div class="player-row"><span>${p.name}</span>
+      <div style="display:flex;gap:8px;align-items:center"><span class="badge badge-sub">sub</span>
+      <button class="btn btn-danger" onclick="deletePlayer('${p.name}')">✕</button></div></div>`).join("");
 }
 
-async function addPlayer() {
-  const name = document.getElementById("new-player-name").value.trim();
-  const type = document.getElementById("new-player-type").value;
-  if (!name) return;
-  if (players.find(p=>p.name===name)) return alert("Jogador já existe.");
-  await api("addPlayer", { name, type });
-  document.getElementById("new-player-name").value = "";
+async function addPlayer(){
+  const name=document.getElementById("new-player-name").value.trim();
+  const type=document.getElementById("new-player-type").value;
+  if(!name)return;
+  if(players.find(p=>p.name===name))return alert("Este jogador já existe.");
+  await api("addPlayer",{name,type});
+  document.getElementById("new-player-name").value="";
   await loadData();
 }
 
-async function deletePlayer(name) {
-  if (!confirm(`Apagar "${name}"?`)) return;
-  await api("deletePlayer", { name });
+async function deletePlayer(name){
+  if(!confirm(`Apagar "${name}"?`))return;
+  await api("deletePlayer",{name});
   await loadData();
 }
 
-// ─── INIT ─────────────────────────────────────────────────────────────────────
-// Update Apps Script to support type field
 loadData();
 </script>
 </body>
