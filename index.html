@@ -16,9 +16,8 @@ body{background:var(--bg);color:var(--text);font-family:'Barlow',sans-serif;min-
 .nav-btn{padding:0 20px;font-size:12px;font-weight:700;color:var(--muted);background:none;border:none;cursor:pointer;border-bottom:3px solid transparent;letter-spacing:1.5px;transition:all .2s;text-transform:uppercase;white-space:nowrap;font-family:'Barlow',sans-serif}
 .nav-btn:hover{color:var(--text);background:rgba(255,85,0,.05)}
 .nav-btn.active{color:var(--orange);border-bottom-color:var(--orange)}
-.sync-pill{display:flex;align-items:center;gap:6px;margin:auto 16px auto auto;padding:5px 12px;border-radius:20px;border:1px solid var(--border);font-size:11px;font-weight:600;cursor:pointer;background:var(--bg3);transition:all .2s;white-space:nowrap}
-.sync-pill:hover{border-color:var(--border2)}
-.sync-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.sync-pill{display:flex;align-items:center;gap:6px;margin:auto 16px auto auto;padding:5px 12px;border-radius:20px;border:1px solid var(--border);font-size:11px;font-weight:600;cursor:pointer;background:var(--bg3);white-space:nowrap}
+.sync-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;transition:background .3s}
 .content{max-width:1140px;margin:0 auto;padding:36px 24px}
 .page-header{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:32px;flex-wrap:wrap;gap:16px}
 .page-title{font-family:'Anton',sans-serif;font-size:44px;letter-spacing:4px;text-transform:uppercase;line-height:1;background:linear-gradient(90deg,#fff 60%,var(--orange));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
@@ -82,10 +81,9 @@ select.input option{background:#181818}
 .loading-sub{color:var(--muted);font-size:12px;letter-spacing:2px;text-transform:uppercase;font-weight:700}
 .spinner{width:30px;height:30px;border:3px solid #222;border-top-color:var(--orange);border-radius:50%;animation:spin .7s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
-.spin-small{display:inline-block;width:7px;height:7px;border:2px solid #333;border-top-color:var(--orange);border-radius:50%;animation:spin .6s linear infinite;flex-shrink:0}
 .hidden{display:none!important}
 @media(max-width:900px){.stat-grid{grid-template-columns:1fr 1fr}}
-@media(max-width:600px){.grid-2,.stat-grid{grid-template-columns:1fr}.page-title{font-size:34px}}
+@media(max-width:600px){.grid-2,.stat-grid{grid-template-columns:1fr}.page-title{font-size:32px}}
 </style>
 </head>
 <body>
@@ -109,14 +107,12 @@ select.input option{background:#181818}
       <button class="nav-btn" onclick="showView('players')">Jogadores</button>
     </div>
     <div class="sync-pill" onclick="loadData()">
-      <div class="sync-dot" id="sync-dot" style="background:#444"></div>
-      <span id="sync-label" style="color:#666">A ligar...</span>
+      <div class="sync-dot" id="sync-dot" style="background:#FF5500"></div>
+      <span id="sync-label" style="color:#FF5500">Firebase</span>
     </div>
   </nav>
 
   <div class="content">
-
-    <!-- DASHBOARD -->
     <div id="view-dashboard">
       <div class="page-header">
         <h1 class="page-title">Estatísticas</h1>
@@ -131,7 +127,6 @@ select.input option{background:#181818}
       <div id="dashboard-content"></div>
     </div>
 
-    <!-- REGISTER -->
     <div id="view-register" class="hidden">
       <div class="page-header"><h1 class="page-title">Registar Jogo</h1></div>
       <div id="register-alert" class="hidden"></div>
@@ -167,13 +162,11 @@ select.input option{background:#181818}
       </div>
     </div>
 
-    <!-- HISTORY -->
     <div id="view-history" class="hidden">
       <div class="page-header"><h1 class="page-title">Histórico</h1></div>
       <div id="history-content"></div>
     </div>
 
-    <!-- PLAYERS -->
     <div id="view-players" class="hidden">
       <div class="page-header"><h1 class="page-title">Jogadores</h1></div>
       <div style="max-width:520px">
@@ -200,94 +193,96 @@ select.input option{background:#181818}
         </div>
       </div>
     </div>
-
   </div>
 </div>
 
-<script>
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzRuqNsjtxPbuZvybGB9M8Pru_LDzWFLVxE8dJwpy28rUly0IuiyqJPGzscdNJYg5qxDA/exec";
+<!-- Firebase SDK -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getFirestore, collection, getDocs, addDoc, deleteDoc, doc, query, orderBy } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBlkEC-hGDO7RiIsT_-IatRkLL7t6YAMeU",
+  authDomain: "padeleiros-oficial.firebaseapp.com",
+  projectId: "padeleiros-oficial",
+  storageBucket: "padeleiros-oficial.firebasestorage.app",
+  messagingSenderId: "198108255791",
+  appId: "1:198108255791:web:4d491a3e5b9d3e98a658da"
+};
+
+const firebaseApp = initializeApp(firebaseConfig);
+const db = getFirestore(firebaseApp);
+
 let games = [], players = [];
 
-// ── JSONP — contorna o CORS/redirect do Google ────────────────────────────────
-function jsonp(url) {
-  return new Promise((resolve, reject) => {
-    const cb = "_padelcb_" + Date.now() + "_" + Math.random().toString(36).slice(2);
-    const script = document.createElement("script");
-    const timer = setTimeout(() => {
-      cleanup(); reject(new Error("Timeout — verifica se o script está publicado"));
-    }, 20000);
-    function cleanup() { delete window[cb]; if (script.parentNode) document.body.removeChild(script); }
-    window[cb] = (data) => { clearTimeout(timer); cleanup(); resolve(data); };
-    script.onerror = () => { clearTimeout(timer); cleanup(); reject(new Error("Erro ao carregar script")); };
-    script.src = url + (url.includes("?")?"&":"?") + "callback=" + cb;
-    document.body.appendChild(script);
-  });
+// ── FIRESTORE OPS ─────────────────────────────────────────────────────────────
+async function fbLoadAll() {
+  const [gSnap, pSnap] = await Promise.all([
+    getDocs(query(collection(db, "games"), orderBy("date", "desc"))),
+    getDocs(collection(db, "players"))
+  ]);
+  games = gSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+  players = pSnap.docs.map(d => ({ id: d.id, ...d.data() }));
 }
 
-async function api(action, body = {}) {
+async function fbAddGame(game) {
+  const ref = await addDoc(collection(db, "games"), game);
+  return ref.id;
+}
+
+async function fbDeleteGame(id) {
+  await deleteDoc(doc(db, "games", id));
+}
+
+async function fbAddPlayer(name, type) {
+  await addDoc(collection(db, "players"), { name, type });
+}
+
+async function fbDeletePlayer(id) {
+  await deleteDoc(doc(db, "players", id));
+}
+
+// ── LOAD ──────────────────────────────────────────────────────────────────────
+window.loadData = async function() {
   setSyncStatus("syncing");
   try {
-    let data;
-    const dataParam = Object.keys(body).length ? "&data=" + encodeURIComponent(JSON.stringify(body)) : "";
-    data = await jsonp(`${SCRIPT_URL}?action=${action}${dataParam}`);
-    if (data && data.error) throw new Error(data.error);
+    await fbLoadAll();
     setSyncStatus("ok");
-    return data;
+    renderAll();
+    document.getElementById("loading-screen").classList.add("hidden");
+    document.getElementById("app").classList.remove("hidden");
   } catch(e) {
-    setSyncStatus("error");
-    throw e;
+    console.error(e);
+    document.getElementById("loading-screen").innerHTML = `
+      <div class="loading-logo">🎾 PADELEIROS</div>
+      <div style="color:#e06060;font-size:14px;text-align:center;max-width:400px;line-height:2">
+        <strong>Erro ao ligar ao Firebase</strong><br>${e.message}<br><br>
+        Confirma que o Firestore está criado em modo de teste.<br><br>
+        <button class="btn btn-primary" onclick="loadData()">↻ Tentar novamente</button>
+      </div>`;
   }
-}
+};
 
 // ── SYNC STATUS ───────────────────────────────────────────────────────────────
 function setSyncStatus(s) {
   const dot = document.getElementById("sync-dot");
   const lbl = document.getElementById("sync-label");
-  const c = {ok:"#FF5500",error:"#cc4444",syncing:"#888"};
-  const t = {ok:"Sincronizado",error:"Erro de ligação",syncing:"A sincronizar..."};
-  if (s === "syncing") {
-    dot.style.display = "none";
-    dot.insertAdjacentHTML("afterend", `<span class="spin-small" id="sync-spin"></span>`);
-  } else {
-    const sp = document.getElementById("sync-spin");
-    if (sp) sp.remove();
-    dot.style.display = "block";
-  }
-  dot.style.background = c[s]||"#444";
-  lbl.textContent = t[s]||"";
-  lbl.style.color = c[s]||"#666";
-}
-
-// ── LOAD ──────────────────────────────────────────────────────────────────────
-async function loadData() {
-  try {
-    const data = await api("getAll");
-    games = data.games || [];
-    players = data.players || [];
-    renderAll();
-    document.getElementById("loading-screen").classList.add("hidden");
-    document.getElementById("app").classList.remove("hidden");
-  } catch(e) {
-    document.getElementById("loading-screen").innerHTML = `
-      <div class="loading-logo">🎾 PADELEIROS</div>
-      <div style="color:#e06060;font-size:14px;text-align:center;max-width:400px;line-height:1.9">
-        <strong>Erro ao ligar ao Google Sheets</strong><br><br>
-        ${e.message}<br><br>
-        Confirma que o Apps Script está publicado como<br><em>"Qualquer pessoa"</em> e republicado com nova versão.
-        <br><br>
-        <button class="btn btn-primary" onclick="loadData()" style="margin-top:8px">↻ Tentar novamente</button>
-      </div>`;
-  }
+  const c = { ok:"#FF5500", error:"#cc4444", syncing:"#888" };
+  const t = { ok:"Firebase ✓", error:"Erro", syncing:"A sincronizar..." };
+  dot.style.background = c[s];
+  lbl.textContent = t[s];
+  lbl.style.color = c[s];
 }
 
 // ── VIEWS ─────────────────────────────────────────────────────────────────────
-function showView(v) {
+window.showView = function(v) {
   ["dashboard","register","history","players"].forEach(x =>
     document.getElementById("view-"+x).classList.toggle("hidden", x!==v));
   document.querySelectorAll(".nav-btn").forEach((b,i) =>
     b.classList.toggle("active", ["dashboard","register","history","players"][i]===v));
   renderAll();
-}
+};
+
 function renderAll(){ renderDashboard(); renderHistory(); renderPlayers(); populateSelects(); }
 
 // ── DASHBOARD ─────────────────────────────────────────────────────────────────
@@ -296,14 +291,14 @@ function getFiltered() {
   const t = document.getElementById("filter-to").value;
   return games.filter(g=>(!f||g.date>=f)&&(!t||g.date<=t));
 }
-function clearFilters(){ document.getElementById("filter-from").value=""; document.getElementById("filter-to").value=""; renderDashboard(); }
+window.clearFilters = function(){ document.getElementById("filter-from").value=""; document.getElementById("filter-to").value=""; renderDashboard(); };
 
 function computeStats(fg) {
   const wins={},losses={},played={},pairWins={},pairGames={},streaks={},cur={};
   [...new Set([...players.map(p=>p.name),...fg.flatMap(g=>[...g.team1,...g.team2])])].forEach(p=>{wins[p]=0;losses[p]=0;played[p]=0;streaks[p]=0;cur[p]=0;});
   [...fg].sort((a,b)=>a.date.localeCompare(b.date)).forEach(g=>{
     const t1w=parseInt(g.score1)>parseInt(g.score2);
-    const W=t1w?g.team1:g.team2,L=t1w?g.team2:g.team1;
+    const W=t1w?g.team1:g.team2, L=t1w?g.team2:g.team1;
     W.forEach(p=>{wins[p]=(wins[p]||0)+1;played[p]=(played[p]||0)+1;cur[p]=(cur[p]||0)+1;if(cur[p]>(streaks[p]||0))streaks[p]=cur[p];});
     L.forEach(p=>{losses[p]=(losses[p]||0)+1;played[p]=(played[p]||0)+1;cur[p]=0;});
     const wp=[...W].sort().join(" & "),lp=[...L].sort().join(" & ");
@@ -381,7 +376,7 @@ function showAlert(msg,type){
   if(type==="ok")setTimeout(()=>el.classList.add("hidden"),3500);
 }
 
-async function registerGame(){
+window.registerGame = async function(){
   const t1=[document.getElementById("t1p1").value,document.getElementById("t1p2").value];
   const t2=[document.getElementById("t2p1").value,document.getElementById("t2p2").value];
   const s1=document.getElementById("score1").value,s2=document.getElementById("score2").value;
@@ -392,12 +387,15 @@ async function registerGame(){
   if(s1===""||s2==="") return showAlert("Insere os resultados.","err");
   if(parseInt(s1)===parseInt(s2)) return showAlert("O resultado não pode ser empate.","err");
   try{
-    await api("addGame",{game:{date,team1:t1,team2:t2,score1:s1,score2:s2}});
-    await loadData();
+    setSyncStatus("syncing");
+    await fbAddGame({date,team1:t1,team2:t2,score1:s1,score2:s2});
+    await fbLoadAll();
+    setSyncStatus("ok");
+    renderAll();
     ["t1p1","t1p2","t2p1","t2p2","score1","score2"].forEach(id=>document.getElementById(id).value="");
     showAlert("🎾 Jogo guardado com sucesso!","ok");
-  }catch(e){showAlert("Erro ao guardar: "+e.message,"err");}
-}
+  }catch(e){setSyncStatus("error");showAlert("Erro: "+e.message,"err");}
+};
 
 // ── HISTORY ───────────────────────────────────────────────────────────────────
 function renderHistory(){
@@ -420,17 +418,20 @@ function renderHistory(){
         </td>
         <td style="font-weight:${!t1w?700:400};color:${!t1w?"var(--text)":"var(--muted)"}">${g.team2.map(pEl).join("<br>")}</td>
         <td><span class="badge badge-win">${(t1w?g.team1:g.team2).join(" & ")}</span></td>
-        <td><button class="btn btn-danger" onclick="deleteGame('${g.id}')">✕</button></td>
+        <td><button class="btn btn-danger" onclick="window.deleteGame('${g.id}')">✕</button></td>
       </tr>`;
     }).join("")}</tbody>
   </table></div>`;
 }
 
-async function deleteGame(id){
+window.deleteGame = async function(id){
   if(!confirm("Apagar este jogo?"))return;
-  await api("deleteGame",{id});
-  await loadData();
-}
+  setSyncStatus("syncing");
+  await fbDeleteGame(id);
+  await fbLoadAll();
+  setSyncStatus("ok");
+  renderAll();
+};
 
 // ── PLAYERS ───────────────────────────────────────────────────────────────────
 function renderPlayers(){
@@ -440,30 +441,37 @@ function renderPlayers(){
     ?`<div style="color:var(--muted);font-size:14px;padding:10px 0">Nenhum jogador habitual.</div>`
     :core.map(p=>`<div class="player-row"><span style="font-weight:600">${p.name}</span>
       <div style="display:flex;gap:8px;align-items:center"><span class="badge badge-core">habitual</span>
-      <button class="btn btn-danger" onclick="deletePlayer('${p.name}')">✕</button></div></div>`).join("");
+      <button class="btn btn-danger" onclick="window.deletePlayer('${p.id}')">✕</button></div></div>`).join("");
   document.getElementById("sub-players-list").innerHTML=!subs.length
     ?`<div style="color:var(--muted);font-size:14px;padding:10px 0">Nenhum substituto.</div>`
     :subs.map(p=>`<div class="player-row"><span>${p.name}</span>
       <div style="display:flex;gap:8px;align-items:center"><span class="badge badge-sub">sub</span>
-      <button class="btn btn-danger" onclick="deletePlayer('${p.name}')">✕</button></div></div>`).join("");
+      <button class="btn btn-danger" onclick="window.deletePlayer('${p.id}')">✕</button></div></div>`).join("");
 }
 
-async function addPlayer(){
+window.addPlayer = async function(){
   const name=document.getElementById("new-player-name").value.trim();
   const type=document.getElementById("new-player-type").value;
   if(!name)return;
   if(players.find(p=>p.name===name))return alert("Este jogador já existe.");
-  await api("addPlayer",{name,type});
+  setSyncStatus("syncing");
+  await fbAddPlayer(name,type);
+  await fbLoadAll();
+  setSyncStatus("ok");
+  renderAll();
   document.getElementById("new-player-name").value="";
-  await loadData();
-}
+};
 
-async function deletePlayer(name){
-  if(!confirm(`Apagar "${name}"?`))return;
-  await api("deletePlayer",{name});
-  await loadData();
-}
+window.deletePlayer = async function(id){
+  if(!confirm("Apagar este jogador?"))return;
+  setSyncStatus("syncing");
+  await fbDeletePlayer(id);
+  await fbLoadAll();
+  setSyncStatus("ok");
+  renderAll();
+};
 
+// ── INIT ──────────────────────────────────────────────────────────────────────
 loadData();
 </script>
 </body>
