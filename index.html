@@ -185,7 +185,7 @@ select.input option{background:#181818}
     </div>
     <div class="nav-links">
       <button class="nav-btn active" onclick="showView('dashboard')">Dashboard</button>
-      <button class="nav-btn" onclick="showView('quarta')">Quarta 🗓️</button>
+      <button class="nav-btn" onclick="showView('proxjogo')">Próximo Jogo</button>
       <button class="nav-btn" onclick="showView('register')">Registar</button>
       <button class="nav-btn" onclick="showView('history')">Histórico</button>
       <button class="nav-btn" onclick="showView('players')">Jogadores</button>
@@ -198,7 +198,7 @@ select.input option{background:#181818}
   <nav class="bottom-nav">
     <div class="bottom-nav-inner">
       <button class="bottom-btn active" id="mob-dashboard" onclick="showView('dashboard')"><span class="bottom-icon">📊</span>Stats</button>
-      <button class="bottom-btn" id="mob-quarta" onclick="showView('quarta')"><span class="bottom-icon">🗓️</span>Quarta</button>
+      <button class="bottom-btn" id="mob-proxjogo" onclick="showView('proxjogo')"><span class="bottom-icon">🗓️</span>Próximo</button>
       <button class="bottom-btn" id="mob-register" onclick="showView('register')"><div class="register-fab">🎾</div></button>
       <button class="bottom-btn" id="mob-history" onclick="showView('history')"><span class="bottom-icon">📋</span>Histórico</button>
       <button class="bottom-btn" id="mob-players" onclick="showView('players')"><span class="bottom-icon">👥</span>Jogadores</button>
@@ -223,9 +223,9 @@ select.input option{background:#181818}
     </div>
 
     <!-- QUARTA -->
-    <div id="view-quarta" class="hidden">
-      <div class="page-header"><h1 class="page-title">Quarta 🗓️</h1></div>
-      <div id="quarta-content" style="max-width:600px"></div>
+    <div id="view-proxjogo" class="hidden">
+      <div class="page-header"><h1 class="page-title">Próximo Jogo</h1></div>
+      <div id="proxjogo-content" style="max-width:600px"></div>
     </div>
 
     <!-- REGISTER -->
@@ -440,18 +440,18 @@ async function saveWeekDoc(){
 
 // ── VIEWS ─────────────────────────────────────────────────────────────────────
 window.showView=function(v){
-  ["dashboard","quarta","register","history","players"].forEach(x=>
+  ["dashboard","proxjogo","register","history","players"].forEach(x=>
     document.getElementById("view-"+x).classList.toggle("hidden",x!==v));
   document.querySelectorAll(".nav-btn").forEach((b,i)=>
-    b.classList.toggle("active",["dashboard","quarta","register","history","players"][i]===v));
-  ["dashboard","quarta","register","history","players"].forEach(x=>{
+    b.classList.toggle("active",["dashboard","proxjogo","register","history","players"][i]===v));
+  ["dashboard","proxjogo","register","history","players"].forEach(x=>{
     const el=document.getElementById("mob-"+x);if(el)el.classList.toggle("active",x===v);
   });
   renderAll();
   window.scrollTo({top:0,behavior:"smooth"});
 };
 
-function renderAll(){renderDashboard();renderQuarta();renderHistory();renderPlayers();populateSelects();}
+function renderAll(){renderDashboard();renderProxJogo();renderHistory();renderPlayers();populateSelects();}
 
 // ── DASHBOARD ─────────────────────────────────────────────────────────────────
 function getFiltered(){
@@ -583,14 +583,14 @@ function renderDashboard(){
 }
 
 // ── QUARTA ────────────────────────────────────────────────────────────────────
-function renderQuarta(){
-  const el=document.getElementById("quarta-content");
+function renderProxJogo(){
+  const el=document.getElementById("proxjogo-content");
   const wid=getWeekId();
   const label=getWeekLabel();
   const avail=weekDoc.available||[];
   const cancelled=weekDoc.cancelled||false;
   const draw=weekDoc.draw||null;
-  const allPlayers=players.filter(p=>p.type==="habitual");
+  const allPlayers=players;
 
   let html=`<div class="section" style="margin-bottom:16px">
     <div class="section-header"><div class="section-accent"></div>
@@ -651,20 +651,20 @@ window.toggleAvail=async function(name){
   if(idx>=0)avail.splice(idx,1);else avail.push(name);
   weekDoc.available=avail;
   await saveWeekDoc();
-  renderQuarta();
+  renderProxJogo();
 };
 
 window.cancelWeek=async function(){
   if(!confirm("Cancelar o jogo desta semana?"))return;
   weekDoc.cancelled=true;
   await saveWeekDoc();
-  renderQuarta();
+  renderProxJogo();
 };
 
 window.uncancelWeek=async function(){
   weekDoc.cancelled=false;
   await saveWeekDoc();
-  renderQuarta();
+  renderProxJogo();
 };
 
 // ── DRAW TEAMS ────────────────────────────────────────────────────────────────
@@ -728,7 +728,7 @@ window.drawTeams=async function(){
 
   weekDoc.draw={...chosen,warning};
   await saveWeekDoc();
-  renderQuarta();
+  renderProxJogo();
 };
 
 // ── REGISTER ──────────────────────────────────────────────────────────────────
