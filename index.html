@@ -733,12 +733,26 @@ window.drawTeams=async function(){
 
 // ── REGISTER ──────────────────────────────────────────────────────────────────
 function populateSelects(){
-  ["t1p1","t1p2","t2p1","t2p2"].forEach((id,i)=>{
-    const sel=document.getElementById(id),cur=sel.value;
-    const ph=["Jogador 1","Jogador 2","Jogador 1","Jogador 2"][i];
-    sel.innerHTML=`<option value="">— ${ph} —</option>`+players.map(p=>`<option value="${p.name}"${p.name===cur?" selected":""}>${p.name}${p.type==="substituto"?" (sub)":""}</option>`).join("");
-  });
-  const d=document.getElementById("game-date");if(!d.value)d.value=new Date().toISOString().slice(0,10);
+  // Pre-fill from draw if available and fields are empty
+  const draw=weekDoc.draw||null;
+  const anyFilled=["t1p1","t1p2","t2p1","t2p2"].some(id=>document.getElementById(id).value);
+  if(draw&&!anyFilled){
+    const preset=[draw.team1[0],draw.team1[1],draw.team2[0],draw.team2[1]];
+    ["t1p1","t1p2","t2p1","t2p2"].forEach((id,i)=>{
+      const sel=document.getElementById(id);
+      const ph=["Jogador 1","Jogador 2","Jogador 1","Jogador 2"][i];
+      sel.innerHTML=`<option value="">— ${ph} —</option>`+players.map(p=>`<option value="${p.name}"${p.name===preset[i]?" selected":""}>${p.name}${p.type==="substituto"?" (sub)":""}</option>`).join("");
+    });
+  } else {
+    ["t1p1","t1p2","t2p1","t2p2"].forEach((id,i)=>{
+      const sel=document.getElementById(id),cur=sel.value;
+      const ph=["Jogador 1","Jogador 2","Jogador 1","Jogador 2"][i];
+      sel.innerHTML=`<option value="">— ${ph} —</option>`+players.map(p=>`<option value="${p.name}"${p.name===cur?" selected":""}>${p.name}${p.type==="substituto"?" (sub)":""}</option>`).join("");
+    });
+  }
+  // Set date to this week's Wednesday
+  const d=document.getElementById("game-date");
+  if(!d.value)d.value=draw?getWeekId():new Date().toISOString().slice(0,10);
 }
 
 function getSetVal(set,team){const v=document.getElementById(`s${set}g${team}`).value;return v===""?null:parseInt(v);}
